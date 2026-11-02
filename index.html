@@ -1,0 +1,1429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agency Builder CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAFAF9;--side:#F3F3F1;--surface:#FFFFFF;--surface-2:#F7F7F5;--hover:#F0F0ED;
+  --ink:#1B1B1A;--ink-2:#46463F;--muted:#74746D;--faint:#A6A69F;--line:#E5E5E1;--line-2:#EEEEEA;
+  --accent:#2D4FC4;--accent-ink:#FFFFFF;--accent-soft:#ECF0FC;
+  --won:#1F7A4E;--won-soft:#E6F3EC;--lost:#B4433A;--lost-soft:#F9EAE8;--warn:#9C620E;--warn-soft:#FAF1E0;
+  --pop:0 1px 2px rgba(0,0,0,.05),0 10px 30px rgba(0,0,0,.12);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#151514;--side:#101010;--surface:#1B1B1A;--surface-2:#20201E;--hover:#262624;
+  --ink:#EDEDEA;--ink-2:#CACAC4;--muted:#98988F;--faint:#6E6E68;--line:#2B2B28;--line-2:#232321;
+  --accent:#90A8FF;--accent-ink:#0E1430;--accent-soft:#1F2744;
+  --won:#62C898;--won-soft:#15291F;--lost:#F08C82;--lost-soft:#2E1816;--warn:#E2B064;--warn-soft:#2A2212;
+  --pop:0 1px 2px rgba(0,0,0,.4),0 12px 34px rgba(0,0,0,.5);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#151514;--side:#101010;--surface:#1B1B1A;--surface-2:#20201E;--hover:#262624;
+  --ink:#EDEDEA;--ink-2:#CACAC4;--muted:#98988F;--faint:#6E6E68;--line:#2B2B28;--line-2:#232321;
+  --accent:#90A8FF;--accent-ink:#0E1430;--accent-soft:#1F2744;
+  --won:#62C898;--won-soft:#15291F;--lost:#F08C82;--lost-soft:#2E1816;--warn:#E2B064;--warn-soft:#2A2212;
+  --pop:0 1px 2px rgba(0,0,0,.4),0 12px 34px rgba(0,0,0,.5);color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:13.5px/1.45 "Geist",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.011em}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.muted{color:var(--muted)}.small{font-size:12.5px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-weight:500;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--hover)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn.primary:hover{opacity:.88;background:var(--ink)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--ink-2)}
+.btn.ghost:hover{background:var(--hover)}
+.btn.sm{height:28px;padding:0 10px;font-size:13px}
+.btn.lg{height:40px;font-size:14px;width:100%;justify-content:center}
+.btn[disabled]{opacity:.55;cursor:default}
+.btn.danger{color:var(--lost)}
+.linkbtn{background:none;border:0;color:var(--accent);font:inherit;font-weight:500;cursor:pointer;padding:0}
+.linkbtn[disabled]{color:var(--muted);cursor:default}
+.icon-btn{width:28px;height:28px;border-radius:6px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer;flex:none}
+.icon-btn:hover{background:var(--hover);color:var(--ink)}
+.icon-btn[disabled]{opacity:.3;cursor:default}
+input:not([type=checkbox]):not([type=radio]),select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 10px;width:100%}
+textarea{resize:vertical}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.err{color:var(--lost);font-size:13px;margin:8px 0 0}
+kbd{font:11.5px/1.6 inherit;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--muted);background:var(--surface)}
+.mark{width:26px;height:26px;border-radius:7px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:600;font-size:11px;flex:none}
+
+/* ---------- Login ---------- */
+.auth{display:flex;flex-direction:column;min-height:100%;padding:24px 28px}
+.auth-left{background:var(--side);border-right:1px solid var(--line);padding:32px 44px;display:flex;flex-direction:column}
+.logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
+.win{margin:auto 0;max-width:620px;width:100%}
+.win h2{font-size:26px;line-height:1.2;letter-spacing:-.02em;max-width:18ch}
+.win>p{color:var(--muted);margin:10px 0 32px;max-width:52ch;font-size:14px}
+.bands{display:grid;grid-template-columns:132px 1fr;row-gap:12px;column-gap:16px;align-items:center}
+.axis{position:relative;height:16px;font-size:11.5px;color:var(--faint)}
+.axis span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.axis span:first-child{transform:none}.axis span:last-child{transform:translateX(-100%)}
+.axis .nowlbl{color:var(--ink);font-weight:600}
+.bcity strong{display:block;font-weight:500}
+.bcity span{font-size:12.5px;color:var(--muted)}
+.track{position:relative;height:26px;border-radius:6px;background:var(--surface);border:1px solid var(--line)}
+.seg-b{position:absolute;top:3px;bottom:3px;border-radius:4px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+.seg-b.live{background:var(--won-soft);border-color:color-mix(in srgb,var(--won) 45%,transparent)}
+.nowline{position:absolute;top:-6px;bottom:-6px;width:2px;margin-left:-1px;background:var(--ink);border-radius:1px}
+.win-key{display:flex;gap:18px;margin-top:22px;font-size:12.5px;color:var(--muted)}
+.win-key span{display:flex;align-items:center;gap:7px}
+.win-key i{width:14px;height:10px;border-radius:3px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+.win-key i.live{background:var(--won-soft);border-color:color-mix(in srgb,var(--won) 45%,transparent)}
+.auth-foot{color:var(--muted);font-size:12.5px;margin:0}
+.auth-right{display:flex;flex-direction:column;padding:32px 24px}
+.auth-card{width:100%;max-width:360px;margin:auto}
+.auth-card h1{font-size:22px;letter-spacing:-.02em}
+.auth-card .sub{color:var(--muted);margin:6px 0 26px;font-size:14px}
+.gbtn{display:flex;width:100%;height:40px;align-items:center;justify-content:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:8px;font:inherit;font-size:14px;font-weight:500;color:var(--ink);cursor:pointer}
+.gbtn:hover{background:var(--hover)}
+.or{display:flex;align-items:center;gap:12px;color:var(--faint);font-size:12px;margin:18px 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.flabel{display:block;font-weight:500;margin-bottom:6px}
+.auth-card input:not([type=checkbox]){height:40px;font-size:14px}
+.auth-card form .btn{margin-top:12px}
+.demo{margin-top:24px;padding:12px 14px;border:1px dashed var(--line);border-radius:8px;font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;align-items:center}
+.demo strong{color:var(--ink-2);font-weight:500}
+.back{display:inline-flex;align-items:center;gap:4px;margin-bottom:22px;color:var(--muted);font-weight:500}
+.back:hover{color:var(--ink)}
+.acct{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.acct li+li{border-top:1px solid var(--line)}
+.acct button{width:100%;display:flex;gap:12px;align-items:center;padding:12px 14px;background:var(--surface);border:0;font:inherit;color:var(--ink);cursor:pointer;text-align:left}
+.acct button:hover{background:var(--hover)}
+.acct small{display:block;color:var(--muted);font-size:12.5px}
+.otp{display:flex;gap:8px;align-items:center}
+.otp input:not([type=checkbox]){width:46px;height:52px;text-align:center;font-size:22px;font-weight:600;padding:0}
+.otp .gap{width:10px}
+.otp.bad input:not([type=checkbox]){border-color:var(--lost)}
+.check{display:flex;gap:8px;align-items:center;margin-top:18px;color:var(--ink-2)}
+.fine{color:var(--muted);font-size:12.5px;margin:14px 0 0}
+.auth-legal{display:flex;gap:18px;justify-content:center;font-size:12px;color:var(--faint)}
+.auth-legal a{color:var(--faint);text-decoration:none}
+.auth-legal a:hover{color:var(--ink)}
+.ok-state{display:flex;align-items:center;gap:10px;color:var(--won);font-weight:500;margin-top:14px}
+
+/* ---------- Shell ---------- */
+.app{display:grid;grid-template-columns:224px minmax(0,1fr);height:100%}
+.app.chat-open{grid-template-columns:224px minmax(0,1fr) 380px}
+.side{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:10px 8px;min-height:0;overflow:auto}
+.ws{display:flex;align-items:center;gap:9px;padding:6px 8px;border:0;background:none;border-radius:7px;font:inherit;font-weight:600;color:var(--ink);cursor:default;margin-bottom:10px;text-align:left}
+.nav{display:grid;gap:1px}
+.nav a,.vlink{display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:6px;color:var(--ink-2);text-decoration:none;font-weight:500;border:0;background:none;font:inherit;font-weight:500;cursor:pointer;text-align:left;width:100%}
+.nav a svg{color:var(--muted)}
+.nav a:hover,.vlink:hover{background:var(--hover)}
+.nav a[aria-current=page],.vlink[aria-current=true]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.nav a[aria-current=page] svg{color:var(--ink)}
+.nav .count{margin-left:auto;font-size:12px;color:var(--faint);font-weight:400}
+.side-h{font-size:12px;color:var(--faint);padding:18px 8px 6px;font-weight:500}
+.vlink i{width:8px;height:8px;border-radius:2px;flex:none}
+.side-foot{margin-top:auto;padding:10px 4px 2px;display:grid;gap:6px}
+.me{display:flex;gap:9px;align-items:center;padding:4px}
+.me small{display:block;color:var(--muted);font-size:12px}
+.side-actions{display:flex;gap:2px}
+.main{overflow:auto;min-width:0;height:100%}
+.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);display:flex;align-items:center;gap:8px;padding:10px 28px;border-bottom:1px solid var(--line)}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:0 8px 0 10px;height:32px;flex:1;max-width:380px;color:var(--muted)}
+.search input:not([type=checkbox]){border:0;padding:0;background:transparent;box-shadow:none;height:100%}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.top .spacer{flex:1}
+.page{padding:22px 28px 56px;max-width:1340px}
+.ph{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;min-height:32px}
+.ph h1{font-size:18px}
+.ph .meta{color:var(--muted)}
+.ph .acts{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;background:var(--hover);border-radius:7px;padding:2px}
+.seg button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:500;color:var(--muted);padding:4px 10px;border-radius:5px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+
+/* stage, avatar, tag */
+.st{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;color:var(--ink-2)}
+.st i{width:8px;height:8px;border-radius:2px;background:var(--faint);flex:none}
+.st.mid i{background:color-mix(in srgb,var(--accent) 50%,var(--surface))}
+.st.late i{background:var(--accent)}
+.st.won i{background:var(--won)}.st.won{color:var(--won)}
+.st.lost i{background:var(--lost)}.st.lost{color:var(--lost)}
+.av{--h:#74746D;width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;font-size:10.5px;font-weight:600;flex:none;background:color-mix(in srgb,var(--h) 18%,var(--surface));color:color-mix(in srgb,var(--h) 85%,var(--ink))}
+.av.lg{width:40px;height:40px;font-size:14px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.tag{--h:#2D4FC4;display:inline-flex;align-items:center;gap:3px;height:19px;padding:0 6px;border-radius:4px;font-size:11.5px;font-weight:500;white-space:nowrap;background:color-mix(in srgb,var(--h) 12%,transparent);color:color-mix(in srgb,var(--h) 80%,var(--ink))}
+.tag button{border:0;background:none;color:inherit;padding:0;margin-right:-2px;cursor:pointer;display:grid;place-items:center;opacity:.6}
+.tag button:hover{opacity:1}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--faint);display:inline-block;flex:none}
+.dot.ok{background:var(--won)}
+.due{color:var(--muted);white-space:nowrap}
+.due.late{color:var(--warn);font-weight:500}
+
+/* filters */
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 14px}
+.filters select{width:auto;padding:4px 26px 4px 9px;font-size:13px;height:28px;border-radius:6px}
+.fchip{height:28px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);font:inherit;font-size:13px;font-weight:500;color:var(--ink-2);cursor:pointer}
+.fchip[aria-pressed=true],.filters select.on{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 45%,transparent);color:var(--accent)}
+.filters .linkbtn{font-size:13px;margin-left:4px}
+
+/* Calls */
+.calls{max-width:900px}
+.grp{display:flex;align-items:baseline;gap:8px;margin:20px 0 8px}
+.grp h2{font-size:13.5px}
+.grp h2.late{color:var(--warn)}
+.grp span{color:var(--faint);font-size:12.5px}
+.list{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:9px;background:var(--surface);overflow:hidden}
+.qrow{display:grid;grid-template-columns:70px minmax(0,1fr) 150px 28px auto;gap:14px;align-items:center;padding:11px 14px;border-top:1px solid var(--line-2);cursor:pointer}
+.qrow:first-child{border-top:0}
+.qrow:hover{background:var(--surface-2)}
+.q-when{font-weight:500;color:var(--ink-2)}
+.q-when.late{color:var(--warn)}
+.q-who strong{font-weight:500}
+.q-who em{font-style:normal;color:var(--muted);margin-left:6px}
+.q-who span{display:block;color:var(--muted);font-size:13px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-tz{font-size:13px;display:flex;align-items:center;gap:7px;color:var(--ink-2)}
+.empty{padding:36px 20px;text-align:center;color:var(--muted)}
+
+/* Pipeline */
+.board-wrap{overflow-x:auto;margin:0 -28px;padding:0 28px 16px}
+.board{display:flex;gap:10px;min-width:max-content;align-items:flex-start}
+.col{width:250px;flex:none}
+.col header{display:flex;align-items:center;gap:7px;padding:4px 4px 8px;font-weight:500}
+.col-count{color:var(--faint);font-size:12.5px}
+.col-sum{margin-left:auto;color:var(--muted);font-size:12.5px}
+.col-body{padding:4px;min-height:140px;display:flex;flex-direction:column;gap:6px;border-radius:9px;background:var(--side);transition:background .12s}
+.col-body.over{background:var(--accent-soft)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:9px 10px;cursor:grab}
+.card:hover{border-color:var(--faint)}
+.card.dragging{opacity:.4}
+.card-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.card-top strong{font-weight:500}
+.card-co{color:var(--muted);font-size:12.5px;margin:1px 0 8px}
+.card .tags{margin:-3px 0 8px}
+.card-foot{display:flex;justify-content:space-between;gap:8px;font-size:12.5px}
+.val{font-weight:500}
+.col-empty{color:var(--faint);font-size:12.5px;text-align:center;padding:22px 0;margin:0}
+
+/* Tables */
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:880px}
+th{text-align:left;font-weight:500;color:var(--muted);font-size:12.5px;padding:0 12px;height:34px;border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+th button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+th button:hover{color:var(--ink)}
+th button:focus-visible{outline:2px solid var(--accent)}
+th[aria-sort] button{color:var(--ink)}
+td{padding:9px 12px;border-top:1px solid var(--line-2);vertical-align:middle}
+tbody tr:first-child td{border-top:0}
+tbody tr[data-open],tbody tr[data-proj]{cursor:pointer}
+tbody tr[data-open]:hover,tbody tr[data-proj]:hover{background:var(--surface-2)}
+td strong{font-weight:500}
+.sub2{display:block;color:var(--muted);font-size:12.5px}
+.num{text-align:right}
+.tz-cell{display:flex;align-items:center;gap:7px}
+.bar{height:5px;background:var(--line-2);border-radius:3px;overflow:hidden;width:100px}
+.bar i{display:block;height:100%;background:var(--ink-2);border-radius:3px}
+.bar.done i{background:var(--won)}
+.prog{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted)}
+
+/* Dashboard */
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:9px;background:var(--surface);margin:0 0 16px}
+.kpis>div{padding:14px 16px;border-left:1px solid var(--line-2)}
+.kpis>div:first-child{border-left:0}
+.kpis dt{color:var(--muted);font-size:12.5px}
+.kpis dd{margin:4px 0 0;font-size:22px;font-weight:600;letter-spacing:-.02em;display:flex;align-items:baseline;gap:8px}
+.kpis dd small{font-size:12px;font-weight:500;letter-spacing:0}
+.up{color:var(--won)}.down{color:var(--lost)}
+.grow td{background:var(--surface-2);padding:7px 12px;border-top:1px solid var(--line)!important;font-weight:500}
+.grow td .st{margin-right:8px}
+.grow .gsum{float:right;color:var(--muted);font-weight:400}
+tbody:first-of-type .grow td{border-top:0!important}
+.stg+.stg{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-2)}
+.stg-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.stg-h span{color:var(--muted);font-size:12.5px}
+.stg-h strong{font-weight:600;font-size:15px;letter-spacing:-.01em}
+.stg-bar{display:flex;gap:2px;height:10px;border-radius:5px;overflow:hidden;background:var(--line-2);margin-bottom:8px}
+.stg-bar i{display:block;min-width:3px}
+.stg-list{list-style:none;margin:0;padding:0}
+.stg-list button{all:unset;box-sizing:border-box;display:grid;grid-template-columns:9px minmax(0,1fr) 24px 56px;gap:10px;align-items:center;width:calc(100% + 12px);padding:6px;margin:0 -6px;border-radius:6px;cursor:pointer}
+.stg-list button:hover{background:var(--hover)}
+.stg-list button:focus-visible{outline:2px solid var(--accent)}
+.stg-list i{width:9px;height:9px;border-radius:2px}
+.stg-list .c{color:var(--muted);text-align:right}
+.stg-list .v{text-align:right;font-weight:500}
+.stg-list .zero{color:var(--faint)}
+.stg-list .zero .v{font-weight:400}
+.dash{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.chart{border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:14px 16px 16px;min-width:0}
+.chart.span2{grid-column:span 2}
+.chart-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
+.chart-h h2{font-size:13.5px}
+.chart-h span{color:var(--muted);font-size:12.5px}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.ax{font:11px "Geist",system-ui,sans-serif;fill:var(--faint)}
+.gl{stroke:var(--line-2);stroke-width:1}
+.b{fill:var(--ink-2);opacity:.18}
+.b.now{fill:var(--accent);opacity:1}
+.bl{font:500 11px "Geist",system-ui,sans-serif;fill:var(--muted)}
+.hbar{display:grid;grid-template-columns:minmax(96px,130px) 1fr auto;gap:10px;align-items:center;padding:5px 0}
+.hbar .track2{height:8px;background:var(--line-2);border-radius:4px;overflow:hidden}
+.hbar .fill{height:100%;background:var(--ink-2);border-radius:4px;min-width:2px}
+.hbar .n{font-weight:500;white-space:nowrap;text-align:right;min-width:76px}
+.hbar .n small{color:var(--muted);font-weight:400;margin-left:6px}
+.chart h3{font-size:12px;color:var(--muted);font-weight:500;margin:10px 0 2px}
+.donut-wrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.donut-wrap svg{width:132px;flex:none}
+.legend{list-style:none;margin:0;padding:0;flex:1;min-width:150px}
+.legend li{display:grid;grid-template-columns:9px 1fr auto;gap:8px;align-items:center;padding:3px 0}
+.legend i{width:9px;height:9px;border-radius:2px}
+.legend small{color:var(--muted)}
+.dc-total{font:600 22px "Geist",system-ui,sans-serif;fill:var(--ink)}
+.dc-lbl{font:11px "Geist",system-ui,sans-serif;fill:var(--muted)}
+
+/* Security */
+.panel{border:1px solid var(--line);border-radius:9px;background:var(--surface);padding:2px 18px 6px;margin-bottom:16px;max-width:880px}
+.panel h2{font-size:13.5px;margin:14px 0 6px}
+.panel-head{display:flex;justify-content:space-between;align-items:center}
+.panel .note{margin:-2px 0 10px}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:12px 0;border-top:1px solid var(--line-2)}
+.srow strong{font-weight:500}
+.srow p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+.srow select{width:auto}
+.panel table{min-width:600px}
+.panel .table-wrap{border:0;border-radius:0;margin:0 -18px}
+.panel th{background:transparent}
+.panel td select{width:auto;padding:4px 8px}
+code{font:12.5px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--hover);padding:2px 6px;border-radius:4px;white-space:nowrap}
+.switch{position:relative;display:inline-block;width:34px;height:20px;flex:none}
+.switch input{position:absolute;inset:0;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;background:var(--line);border-radius:10px;transition:background .15s}
+.switch span::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
+.switch input:checked+span{background:var(--won)}
+.switch input:checked+span::after{transform:translateX(14px)}
+.switch input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.log{list-style:none;margin:0;padding:0}
+.log li{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid var(--line-2)}
+.log li span:last-child{color:var(--muted);white-space:nowrap}
+.log li.warn span:first-child{color:var(--warn)}
+.howto{max-width:880px;color:var(--muted);font-size:12.5px;margin:6px 0 0}
+
+/* Drawer */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.18);z-index:20}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(470px,100%);background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--pop);z-index:21;transform:translateX(100%);visibility:hidden;transition:transform .2s ease,visibility .2s;overflow-y:auto;padding:calc(18px + env(safe-area-inset-top,0px)) 22px calc(32px + env(safe-area-inset-bottom,0px))}
+.drawer.open{transform:none;visibility:visible}
+.dr-head{display:flex;gap:12px;align-items:center}
+.dr-title{flex:1;min-width:0}
+.dr-title h2{font-size:17px}
+.dr-title p{margin:1px 0 0;color:var(--muted)}
+.dr-actions{display:flex;gap:6px;margin:16px 0 14px;flex-wrap:wrap}
+.tz-line{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);margin:0 0 14px}
+.tag-edit{margin:0 0 18px}
+.tag-edit .tags{margin:0 0 8px}
+.tag-form input:not([type=checkbox]){max-width:230px;padding:5px 9px;font-size:13px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;margin:0 0 24px;padding-top:16px;border-top:1px solid var(--line-2)}
+.fields dt{font-size:12px;color:var(--muted);margin-bottom:4px}
+.fields dd{margin:0;overflow-wrap:anywhere}
+.fields .wide{grid-column:1/-1}
+.fields .wide dd{display:flex;gap:10px;align-items:center}
+.sec h3{font-size:13.5px;margin:0 0 10px}
+.note-form{display:grid;gap:8px;margin-bottom:12px}
+.note-form .btn{justify-self:end}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line-2)}
+.t-ico{width:26px;height:26px;border-radius:50%;background:var(--hover);display:grid;place-items:center;color:var(--ink-2)}
+.t-meta{font-size:12px;color:var(--muted)}
+.t-text{margin:2px 0 0}
+.prog-line{display:flex;align-items:center;gap:12px;margin:-8px 0 20px;font-size:12.5px;color:var(--muted)}
+.prog-line .bar{flex:1;width:auto}
+.tasks{list-style:none;padding:0;margin:0 0 12px}
+.tasks label{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line-2);cursor:pointer}
+.tasks input{width:15px;height:15px;accent-color:var(--won);flex:none}
+.tasks .done span{color:var(--muted);text-decoration:line-through}
+.stages{list-style:none;margin:0 0 12px;padding:0}
+.stages li{display:flex;align-items:center;gap:4px;padding:5px 0;border-top:1px solid var(--line-2)}
+.stages li input:not([type=checkbox]){flex:1}
+.stages .cnt{min-width:22px;text-align:right;color:var(--muted);font-size:12.5px;margin-right:4px}
+.stages li.locked{padding:10px 0 10px 11px;color:var(--muted)}
+.stages li.locked span:first-child{flex:1}
+
+/* Chat */
+.chat{border-left:1px solid var(--line);background:var(--surface);display:none;flex-direction:column;min-height:0;height:100%}
+.app.chat-open .chat{display:flex}
+.chat-head{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.chat-head strong{font-weight:600}
+.chat-head .icon-btn{margin-left:auto}
+.chat-body{flex:1;overflow:auto;padding:16px 14px;display:flex;flex-direction:column;gap:14px}
+.msg{max-width:100%}
+.msg.you{align-self:flex-end;background:var(--hover);padding:8px 11px;border-radius:10px 10px 3px 10px;max-width:85%}
+.msg.bot p{margin:0 0 8px}.msg.bot p:last-child{margin:0}
+.msg.bot ul{margin:0 0 8px;padding-left:18px}.msg.bot li{margin:2px 0}
+.msg .clink{all:unset;color:var(--accent);font-weight:500;cursor:pointer;border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+.msg .clink:hover{border-bottom-color:var(--accent)}
+.msg .clink:focus-visible{outline:2px solid var(--accent)}
+.thinking{color:var(--muted)}
+.msg-err{color:var(--warn)}
+.chat-intro{color:var(--muted);margin:0 0 4px}
+.sugg{display:grid;gap:6px}
+.sugg button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;font:inherit;color:var(--ink-2);cursor:pointer}
+.sugg button:hover{background:var(--hover);color:var(--ink)}
+.chat-form{border-top:1px solid var(--line);padding:10px;display:flex;gap:8px;align-items:flex-end}
+.chat-form textarea{resize:none;min-height:36px;max-height:140px}
+.chat-note{font-size:11.5px;color:var(--faint);padding:0 12px 10px}
+
+/* Modal, toast */
+.modal-wrap{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.28);display:grid;place-items:center;padding:20px}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:12px;width:min(520px,100%);box-shadow:var(--pop);max-height:90vh;overflow:auto}
+.m-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px 0}
+.m-head h2{font-size:15px}
+.m-body{padding:12px 18px 4px;display:grid;gap:12px}
+.m-body label{display:grid;gap:5px;font-weight:500;font-size:13px}
+.m-sub{margin:0;color:var(--muted)}
+.opt{font-weight:400;color:var(--muted)}
+.m-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 18px 16px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chips{border:0;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px}
+.chips legend{font-weight:500;font-size:13px;margin-bottom:6px;padding:0}
+.m-body .chips label{display:inline-flex;position:relative}
+.chips input{position:absolute;opacity:0;width:1px;height:1px}
+.chips span{padding:5px 11px;border:1px solid var(--line);border-radius:6px;font-weight:500;font-size:13px;cursor:pointer}
+.chips input:checked+span{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 50%,transparent);color:var(--accent)}
+.chips input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,14px);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:8px;display:flex;gap:14px;align-items:center;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;z-index:40;font-weight:500;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{background:none;border:0;color:var(--bg);font:inherit;font-weight:600;text-decoration:underline;cursor:pointer;padding:0}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:1100px){.app.chat-open{grid-template-columns:224px minmax(0,1fr)}.app.chat-open .chat{position:fixed;top:0;right:0;bottom:0;width:min(400px,100%);z-index:19;box-shadow:var(--pop)}}
+@media (max-width:1000px){
+  .dash{grid-template-columns:1fr}.chart.span2{grid-column:auto}
+  .kpis{grid-template-columns:1fr 1fr}.kpis>div:nth-child(3){border-left:0}.kpis>div:nth-child(n+3){border-top:1px solid var(--line-2)}
+  .qrow{grid-template-columns:1fr auto;grid-template-areas:"when act" "who who" "tz meta";gap:4px 12px}
+  .q-when{grid-area:when}.q-who{grid-area:who}.q-tz{grid-area:tz}.q-meta{grid-area:meta}.q-act{grid-area:act}
+  .auth{grid-template-columns:1fr}.auth-left{display:none}
+}
+@media (max-width:760px){
+  .app,.app.chat-open{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .side{flex-direction:row;align-items:center;padding:6px 8px;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto;gap:4px}
+  .ws{margin:0}.ws-name,.side-h,#views,.side-foot,.nav .count{display:none}
+  .nav{display:flex}.nav a{white-space:nowrap}
+  .top{padding:8px 14px}.top kbd,.top .lbl{display:none}
+  .page{padding:16px 14px 40px}
+  .board-wrap{margin:0 -14px;padding:0 14px 16px}
+  .row2,.fields{grid-template-columns:1fr}
+  .srow{flex-wrap:wrap}
+  .otp input:not([type=checkbox]){width:40px}
+}
+</style>
+</head>
+<body>
+
+<section id="auth" class="auth">
+  <div class="logo"><span class="mark">AB</span>Agency Builder CRM</div>
+  <div class="auth-card" id="authStep"></div>
+  <div class="auth-legal"><span>Two step verification on every new device</span><a href="#" onclick="return false">Privacy</a><a href="#" onclick="return false">Get help</a></div>
+</section>
+
+<div id="app" class="app" hidden>
+  <nav class="side" aria-label="Main">
+    <div class="ws"><span class="mark">AB</span><span class="ws-name">Agency Builder CRM</span></div>
+    <div class="nav" id="nav"></div>
+    <div class="side-h">Saved views</div>
+    <div id="views" class="nav"></div>
+    <div class="side-foot">
+      <div class="me"><span class="av" style="--h:#2D4FC4">AN</span><div>Ali Nawaz<small>Admin</small></div></div>
+      <div class="side-actions"><button class="btn ghost sm" id="themeBtn">Theme</button><button class="btn ghost sm" id="signOut">Sign out</button></div>
+    </div>
+  </nav>
+  <div class="main" id="main">
+    <header class="top">
+      <label class="search"><span id="searchIco"></span><input id="q" type="search" placeholder="Search contacts" aria-label="Search contacts"><kbd>/</kbd></label>
+      <div class="spacer"></div>
+      <button class="btn sm" id="askBtn" aria-expanded="false"><span id="askIco"></span><span class="lbl">Ask</span></button>
+      <button class="btn primary sm" id="newBtn"><span id="plusIco"></span><span class="lbl">New contact</span></button>
+    </header>
+    <div class="page" id="view"></div>
+  </div>
+  <aside class="chat" id="chat" aria-label="Ask about your pipeline">
+    <div class="chat-head"><span id="askIco2"></span><strong>Ask</strong><span class="muted small">about contacts, deals and the team</span><button class="icon-btn" id="chatClose" aria-label="Close Ask"></button></div>
+    <div class="chat-body" id="chatBody" aria-live="polite"></div>
+    <form class="chat-form" id="chatForm"><textarea id="chatIn" rows="1" placeholder="Ask a question" aria-label="Your question"></textarea><button class="btn primary sm" id="chatSend">Send</button></form>
+    <div class="chat-note">Answers come from the CRM data. Check anything important before acting on it.</div>
+  </aside>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" aria-hidden="true"></aside>
+<div class="modal-wrap" id="modalWrap" hidden><div class="modal" role="dialog" aria-modal="true" id="modal"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+const NOW=new Date();
+const ME='u1';
+const $=(s,el=document)=>el.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sv=(p,s=16)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const I={
+  dashboard:sv('<path d="M3 20h18M6 16v-5M11 16V6M16 16v-8M21 16v-3"/>',15),
+  calls:sv('<path d="M5 3.5h3.2l1.6 4.2-2.1 1.4a11 11 0 0 0 7.2 7.2l1.4-2.1 4.2 1.6V19a1.8 1.8 0 0 1-1.9 1.8C10.5 20.4 3.6 13.5 3.2 5.4A1.8 1.8 0 0 1 5 3.5z"/>',15),
+  pipeline:sv('<rect x="3" y="4" width="5" height="16" rx="1.2"/><rect x="10" y="4" width="5" height="11" rx="1.2"/><rect x="17" y="4" width="4" height="7" rx="1.2"/>',15),
+  contacts:sv('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5M16 4.8a3.3 3.3 0 0 1 0 6.4M18.5 14.8c1.6.8 2.6 2.5 3 5.2"/>',15),
+  projects:sv('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="m9 13.5 2 2 4-4"/>',15),
+  security:sv('<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6z"/>',15),
+  search:sv('<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>',14),
+  plus:sv('<path d="M12 5v14M5 12h14"/>',14),
+  ask:sv('<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H11l-5 4v-4h0A2 2 0 0 1 4 14z"/><path d="M8.5 8.5h7M8.5 11.5h4"/>',14),
+  x:sv('<path d="M6 6l12 12M18 6 6 18"/>',16),
+  xs:sv('<path d="M7 7l10 10M17 7 7 17"/>',11),
+  phone:sv('<path d="M5 3.5h3.2l1.6 4.2-2.1 1.4a11 11 0 0 0 7.2 7.2l1.4-2.1 4.2 1.6V19a1.8 1.8 0 0 1-1.9 1.8C10.5 20.4 3.6 13.5 3.2 5.4A1.8 1.8 0 0 1 5 3.5z"/>',13),
+  mail:sv('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/>',13),
+  note:sv('<path d="M6 3.5h12v17H6z"/><path d="M9.5 8.5h5M9.5 12.5h5"/>',12),
+  stage:sv('<path d="M5 12h14M13 6l6 6-6 6"/>',12),
+  added:sv('<path d="M12 5v14M5 12h14"/>',12),
+  up:sv('<path d="m6 15 6-6 6 6"/>',14),
+  down:sv('<path d="m6 9 6 6 6-6"/>',14),
+  left:sv('<path d="m15 6-6 6 6 6"/>',14),
+  trash:sv('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',14),
+  check:sv('<path d="m5 12.5 4.5 4.5L19 7.5"/>',16),
+  sortUp:sv('<path d="m8 14 4-4 4 4"/>',12),sortDown:sv('<path d="m8 10 4 4 4-4"/>',12)
+};
+const GLOGO='<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2A11.9 11.9 0 0 1 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3a12 12 0 0 1-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
+
+const DOMAIN='theaiagencybuilder.com';
+const TEAM={
+  u1:{name:'Ali Nawaz',role:'Admin',email:'ali@'+DOMAIN,last:'Now',status:'Active'},
+  u2:{name:'Blake Stephens',role:'Admin',email:'blake@'+DOMAIN,last:'Today',status:'Active'},
+  u3:{name:'Ellis',role:'Manager',email:'ellis@'+DOMAIN,last:'Today',status:'Active'}
+};
+const SAMPLE_TEAM={
+  u4:{name:'Jordan Pike',role:'Closer',email:'jordan@'+DOMAIN,last:'Today',status:'Active'},
+  u5:{name:'Maya Chen',role:'Closer',email:'maya@'+DOMAIN,last:'Today',status:'Active'},
+  u6:{name:'Luca Romano',role:'Setter',email:'luca@'+DOMAIN,last:'Yesterday',status:'Active'},
+  u7:{name:'Tasha Reid',role:'Setter',email:'tasha@'+DOMAIN,last:'Today',status:'Active'}
+};
+const ROLES=['Admin','Manager','Closer','Setter'];
+const PIPES={
+  biz:{name:'Business implementation',short:'Business',stages:['New lead','Audit booked','Audit done','Proposal sent','Close call','Won','Lost']},
+  agency:{name:'Agency high ticket',short:'Agency',stages:['New lead','Call booked','Showed','Follow up','Won','Lost']}
+};
+const DEMO_EMAIL='ali@'+DOMAIN,DEMO_CODE='246810';
+const SOURCES=['Onboarding','Meta ad','Skool','Referral','Outbound'];
+const CITY={
+  'Phoenix, AZ':['America/Phoenix','602'],'San Diego, CA':['America/Los_Angeles','619'],'Los Angeles, CA':['America/Los_Angeles','213'],
+  'Seattle, WA':['America/Los_Angeles','206'],'Denver, CO':['America/Denver','303'],'Austin, TX':['America/Chicago','512'],
+  'Houston, TX':['America/Chicago','713'],'Chicago, IL':['America/Chicago','312'],'Nashville, TN':['America/Chicago','615'],
+  'Atlanta, GA':['America/New_York','404'],'Tampa, FL':['America/New_York','813'],'Miami, FL':['America/New_York','305'],
+  'New York, NY':['America/New_York','212'],'Sydney, NSW':['Australia/Sydney'],'Melbourne, VIC':['Australia/Melbourne'],
+  'Brisbane, QLD':['Australia/Brisbane'],'Gold Coast, QLD':['Australia/Brisbane'],'Adelaide, SA':['Australia/Adelaide'],'Perth, WA':['Australia/Perth']
+};
+const at=(days,hour,min)=>{const d=new Date(NOW);d.setDate(d.getDate()+days);d.setHours(hour==null?10:hour,min||0,0,0);return d};
+
+// pipe, name, business, city, stage, value, owner, next step, due in days, hour, source, days since last touch
+const RAW=[
+ ['biz','Dave Morales','Morales Plumbing','Phoenix, AZ','Proposal sent',14000,'u4','Chase the proposal. He wanted to check with his wife.',0,10,'Onboarding',1],
+ ['biz','Priya Nair','Harbourside Physio','Sydney, NSW','Audit done',12000,'u5','Send the audit recording to Ali for the proposal',0,16,'Onboarding',1],
+ ['biz','Tom Becker','Becker Realty Group','San Diego, CA','Close call',18000,'u4','Close call with Tom and his ops manager',0,13,'Referral',2],
+ ['biz','Sarah Whitfield','Whitfield Dental','Austin, TX','Audit booked',16000,'u5','Audit call. Confirm she has her booking system login.',1,11,'Meta ad',3],
+ ['biz','Marcus Hale','Hale Roofing','Denver, CO','New lead',9000,'u6','First call. Finished onboarding yesterday.',-1,9,'Onboarding',1],
+ ['biz','Kim Tran','Tran & Co Accounting','Melbourne, VIC','Won',11000,'u5','',null,null,'Onboarding',5],
+ ['biz','Ben O’Connor','Coastline Electrical','Gold Coast, QLD','Audit booked',8500,'u5','Audit call',2,14,'Skool',2],
+ ['biz','Rachel Stein','Stein Family Law','Chicago, IL','Proposal sent',20000,'u4','Answer her questions on where client data is stored',-2,15,'Referral',6],
+ ['biz','Omar Haddad','Haddad Auto Repair','Houston, TX','Lost',7500,'u6','',null,null,'Meta ad',6],
+ ['biz','Jess Walker','Walker Landscapes','Perth, WA','New lead',6500,'u7','First call',0,15,'Meta ad',0],
+ ['biz','Chris Duval','Duval HVAC','Tampa, FL','Won',13000,'u4','Offer the AI receptionist at day 30',14,10,'Onboarding',12],
+ ['agency','Jake Harmon','','Austin, TX','Call booked',10000,'u6','Strategy call',0,17,'Meta ad',1],
+ ['agency','Mia Lawson','','Perth, WA','Follow up',10000,'u7','Answer her payment plan question',-1,12,'Skool',2],
+ ['agency','Ethan Brooks','','Atlanta, GA','Showed',20000,'u4','Send the recap and close link',0,12,'Meta ad',0],
+ ['agency','Aisha Bello','','Brisbane, QLD','Won',10000,'u5','',null,null,'Skool',20],
+ ['agency','Ryan Cole','','Seattle, WA','New lead',10000,'u6','Book a strategy call',0,11,'Meta ad',7],
+ ['agency','Hannah Price','','Adelaide, SA','Call booked',10000,'u7','Strategy call',1,10,'Skool',3],
+ ['agency','Noah Fischer','','Nashville, TN','Follow up',20000,'u4','Second call with the CSM on receptionist builds',2,16,'Referral',8],
+ ['agency','Leo Martins','','Miami, FL','Lost',10000,'u6','',null,null,'Meta ad',8],
+ ['agency','Grace Kim','','Los Angeles, CA','Showed',10000,'u5','Send the recap and close link',0,9,'Meta ad',1]
+];
+const NOTES={
+ 'Dave Morales':[['call',4,'u4','Audit call, 34 min. Invoices go out weekly and about $52k sits unpaid at any time. His office manager retires in March.'],['email',1,'u4','Sent the proposal. Same day invoicing, quote follow up, enquiry catcher. $14,000 setup.']],
+ 'Priya Nair':[['call',1,'u5','Audit call, 41 min. Two front desk staff on Cliniko. Around 12 no shows a week. Wants reminders and a waitlist.']],
+ 'Tom Becker':[['call',5,'u4','Audit with Tom. 9 agents. Portal leads sit for hours before anyone replies.'],['email',2,'u1','Proposal sent. Lead routing, instant replies, weekly agent report. $18,000.']],
+ 'Rachel Stein':[['email',6,'u4','Rachel asked where client data is stored and who can access it. Needs an answer before she signs.']],
+ 'Omar Haddad':[['call',6,'u6','Lost. Chose a $99 a month chatbot instead.']],
+ 'Mia Lawson':[['call',2,'u7','Strategy call. Keen but nervous about price. Asked about a payment plan.']],
+ 'Ethan Brooks':[['call',0,'u4','Showed, 52 min. Already has two website clients. Wants the $20k tier.']],
+ 'Noah Fischer':[['call',8,'u4','First call. Wants to speak to the CSM about receptionist builds before buying.']],
+ 'Leo Martins':[['call',8,'u6','No budget this quarter. Revisit in February.']],
+ 'Grace Kim':[['call',1,'u5','Showed. Runs a freelance marketing business and wants to add AI websites.']],
+ 'Kim Tran':[['note',5,'u5','Signed. Deposit paid. Handed to delivery.']],
+ 'Chris Duval':[['note',12,'u4','Signed. $13,000 paid in full.']],
+ 'Aisha Bello':[['note',20,'u5','Joined the 0 to $20k program.']]
+};
+const SEED_TAGS={'Dave Morales':['Hot','Decision maker'],'Priya Nair':['Clinic'],'Tom Becker':['Hot','Decision maker'],'Sarah Whitfield':['Clinic'],'Rachel Stein':['Security questions','Decision maker'],'Mia Lawson':['Payment plan'],'Ethan Brooks':['Hot','$20k tier'],'Noah Fischer':['$20k tier','Wants CSM call'],'Kim Tran':['Client'],'Chris Duval':['Client','Upsell'],'Aisha Bello':['Client'],'Ryan Cole':['No show'],'Leo Martins':['Revisit later']};
+const contacts=[],deals=[],acts=[],HISTORY=[],projects=[];
+let seq=0;
+const CALLS_BASE={};
+const PSTAGES=['Kickoff','Build','Test','Handover','Live'];
+// Sample data, only loaded when someone clicks Load sample data
+function seedSample(){
+Object.assign(TEAM,JSON.parse(JSON.stringify(SAMPLE_TEAM)));
+Object.assign(CALLS_BASE,{u3:12,u4:38,u5:41,u6:57,u7:49});
+RAW.forEach((r,i)=>{
+  const [pipe,name,company,city,stage,value,owner,next,due,hour,source,touched]=r;
+  const id='c'+(++seq);
+  const tz=CITY[city][0],au=tz.startsWith('Australia');
+  const parts=name.toLowerCase().replace(/[^a-z ]/g,'').split(' ');
+  const email=company?parts[0]+'@'+company.toLowerCase().replace(/[^a-z]/g,'').slice(0,16)+(au?'.com.au':'.com'):parts.join('.')+'@gmail.com';
+  const phone=au?'+61 491 570 '+(110+i*3):'+1 ('+CITY[city][1]+') 555 01'+String(10+i).slice(-2);
+  const added=at(-(touched+3+i%5),10);
+  contacts.push({id,name,company,city,tz,email,phone,source,added,tags:(SEED_TAGS[name]||[]).slice()});
+  deals.push({id:'d'+seq,cid:id,pipe,stage,value,owner,next,due:due==null?null:at(due,hour,due===0?(i%2?30:0):0),touched:at(-touched,11),closedAt:(stage==='Won'||stage==='Lost')?at(-touched,11):null});
+  acts.push({cid:id,type:'added',when:added,by:owner,text:'Added from '+source});
+  (NOTES[name]||[]).forEach(([type,ago,by,text])=>acts.push({cid:id,type,when:at(-ago,9+ago%6),by,text}));
+});
+// Sample closed deals from the last 8 weeks, so the dashboard has history
+(function(){
+  let s=11;const rnd=()=>(s=(s*9301+49297)%233280)/233280;
+  const reps=['u4','u5','u4','u5','u6','u7'];
+  for(let w=1;w<=8;w++){
+    const n=2+Math.floor(rnd()*4);
+    for(let k=0;k<n;k++){
+      const biz=rnd()<.45;
+      HISTORY.push({pipe:biz?'biz':'agency',value:biz?[6500,8000,9500,12000,14000,16000][Math.floor(rnd()*6)]:(rnd()<.25?20000:10000),owner:reps[Math.floor(rnd()*reps.length)],source:SOURCES[Math.floor(rnd()*SOURCES.length)],won:rnd()<.55,closedAt:at(-(w*7-1-Math.floor(rnd()*6)),12)});
+    }
+  }
+})();
+projects.push(
+ {id:'p1',client:'Tran & Co Accounting',cid:'c6',name:'Client inbox and document chaser',type:'biz',owner:'u1',stage:'Build',due:at(9,17),tasks:[['Kickoff call',1],['Connect Gmail and Calendar',1],['Map how document requests come in',1],['Build the enquiry catcher',0],['Build the document chaser',0],['Test with 5 real clients',0],['Handover call',0]]},
+ {id:'p2',client:'Duval HVAC',cid:'c11',name:'Quote follow up and missed call plan',type:'biz',owner:'u1',stage:'Test',due:at(3,17),tasks:[['Kickoff call',1],['Connect Gmail and QuickBooks',1],['Build quote follow up',1],['Build missed call plan',1],['Test on last month’s quotes',0],['Handover call',0]]},
+ {id:'p3',client:'Aisha Bello',cid:'c15',name:'0 to $20k program, week 3',type:'agency',owner:'u2',stage:'Build',due:at(4,17),tasks:[['Niche and offer locked',1],['Offer page live',1],['First 50 leads found',1],['10 demos sent',0],['First sales call',0],['First client signed',0]]},
+ {id:'p4',client:'Westside Vet Clinic',cid:null,name:'Booking reminders and review asks',type:'biz',owner:'u1',stage:'Handover',due:at(1,17),tasks:[['Kickoff call',1],['Build booking reminders',1],['Build review asks',1],['Test for one week',1],['Handover call',0]]},
+ {id:'p5',client:'Summit Fitness',cid:null,name:'Reply to every lead in 5 minutes',type:'biz',owner:'u1',stage:'Live',due:at(-6,17),tasks:[['Kickoff call',1],['Build lead replies',1],['Test',1],['Handover call',1]]}
+);
+}
+const sessions=[
+ {device:'This browser',where:'Current session',when:'Active now',current:true}
+];
+const auditLog=[
+ ['Ali Nawaz signed in.','Just now']
+];
+
+
+
+const state={scope:'team',pipe:'biz',pview:'board',owner:'all',due:'any',source:'all',tag:'all',cold:false,cpipe:'all',cstage:'all',dpipe:'all',q:'',sort:{key:'name',dir:1},drawer:null};
+
+/* ---------- Saving in this browser ---------- */
+const STORE='abcrm-v1';
+const DATES={contacts:['added'],deals:['due','touched','closedAt'],acts:['when'],projects:['due'],HISTORY:['closedAt']};
+function save(){try{localStorage.setItem(STORE,JSON.stringify({contacts,deals,acts,projects,HISTORY,CALLS_BASE,PIPES,TEAM,sessions,auditLog,seq}))}catch(e){}}
+function load(){try{
+  const raw=localStorage.getItem(STORE);if(!raw)return;const s=JSON.parse(raw);
+  for(const k in DATES)(s[k]||[]).forEach(o=>DATES[k].forEach(f=>{if(o[f])o[f]=new Date(o[f])}));
+  [[contacts,s.contacts],[deals,s.deals],[acts,s.acts],[projects,s.projects],[HISTORY,s.HISTORY||[]],[sessions,s.sessions],[auditLog,s.auditLog]].forEach(([a,b])=>{a.length=0;a.push(...b)});
+  [[PIPES,s.PIPES],[TEAM,s.TEAM],[CALLS_BASE,s.CALLS_BASE||{}]].forEach(([a,b])=>{Object.keys(a).forEach(k=>delete a[k]);Object.assign(a,b)});
+  seq=s.seq;contacts.forEach(c=>{if(!c.tags)c.tags=[]});
+}catch(e){}}
+load();
+function resetDemo(){try{localStorage.removeItem(STORE)}catch(e){}location.reload()}
+function loadSample(){
+  [contacts,deals,acts,projects,HISTORY].forEach(a=>a.length=0);seq=0;
+  seedSample();Object.assign(state,FILTER_DEFAULTS);closeDrawer();render();toast('Sample data loaded');
+}
+function emptyState(title,text){
+  return `<div class="list empty"><p style="margin:0 0 4px;color:var(--ink);font-weight:500">${title}</p><p style="margin:0 0 16px">${text}</p>
+  <div style="display:inline-flex;gap:8px"><button class="btn primary sm" data-newcontact>New contact</button><button class="btn sm" data-sample>Load sample data</button></div></div>`;
+}
+
+/* ---------- Helpers ---------- */
+const byC=id=>contacts.find(c=>c.id===id);
+const dealOf=cid=>deals.find(d=>d.cid===cid);
+const dayStart=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x};
+const dayDiff=d=>Math.round((dayStart(d)-dayStart(NOW))/864e5);
+const tm=d=>d.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'});
+const money=v=>'$'+Number(v).toLocaleString('en-US');
+const short=v=>v>=1000?'$'+(+(v/1000).toFixed(1))+'k':'$'+v;
+const ini=n=>n.split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const first=n=>n.split(' ')[0];
+const cityShort=c=>c.split(',')[0];
+const clean=v=>String(v).replace(/[<>"]/g,'').trim().slice(0,40);
+const isEmail=v=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
+const HUES=['#2D4FC4','#1F7A4E','#B7791F','#B4433A','#7A3FB8','#0F7C86','#A23E7A'];
+const hue=t=>{let h=0;for(const ch of String(t).toLowerCase())h=(h*31+ch.charCodeAt(0))>>>0;return HUES[h%HUES.length]};
+function fmtDue(d){
+  if(!d) return 'No next step';
+  const n=dayDiff(d);
+  if(n<0) return (-n)+(n===-1?' day':' days')+' overdue';
+  if(n===0) return 'Today '+tm(d);
+  if(n===1) return 'Tomorrow';
+  return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+}
+function fmtAgo(d){const n=dayDiff(d);return n===0?'today':n===-1?'yesterday':n<0?(-n)+' days ago':'in '+n+' days'}
+function theirTime(tz,at){
+  const now=at||new Date();
+  const p={};new Intl.DateTimeFormat('en-US',{timeZone:tz,hour:'numeric',weekday:'short',hourCycle:'h23'}).formatToParts(now).forEach(x=>p[x.type]=x.value);
+  const h=(+p.hour)%24,weekend=p.weekday==='Sat'||p.weekday==='Sun';
+  const time=now.toLocaleTimeString('en-AU',{timeZone:tz,hour:'numeric',minute:'2-digit'});
+  const ok=!weekend&&h>=9&&h<19;
+  return {time,ok,weekend,label:ok?'Good time to call':weekend?'Weekend there':h<9?'Too early there':'After hours there'};
+}
+function tzOffsetMin(tz){
+  const now=new Date(),p={};
+  new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).formatToParts(now).forEach(x=>p[x.type]=x.value);
+  return Math.round((Date.UTC(+p.year,+p.month-1,+p.day,(+p.hour)%24,+p.minute)-now.getTime())/60000);
+}
+const openStages=pipe=>PIPES[pipe].stages.filter(s=>s!=='Won'&&s!=='Lost');
+const isLate=d=>{const o=openStages(d.pipe),i=o.indexOf(d.stage);return i>=0&&o.length>2&&i>=o.length-2};
+const stageCls=d=>{const s=d.stage;if(s==='Won')return 'won';if(s==='Lost')return 'lost';const i=openStages(d.pipe).indexOf(s);return i<=0?'':isLate(d)?'late':'mid'};
+const stage=d=>`<span class="st ${stageCls(d)}"><i></i>${esc(d.stage)}</span>`;
+const pstage=s=>`<span class="st ${s==='Live'?'won':s==='Handover'?'late':s==='Kickoff'?'':'mid'}"><i></i>${s}</span>`;
+const avatar=(u,cls)=>{const t=TEAM[u]||{name:'?'};return `<span class="av ${cls||''}" style="--h:${hue(t.name)}" title="${esc(t.name)}">${ini(t.name)}</span>`};
+const isOpen=d=>d.stage!=='Won'&&d.stage!=='Lost';
+const ownerOpts=sel=>Object.entries(TEAM).map(([k,u])=>`<option value="${k}" ${k===sel?'selected':''}>${esc(u.name)}</option>`).join('');
+const tagEl=(t,rm)=>`<span class="tag" style="--h:${hue(t)}">${esc(t)}${rm?`<button type="button" data-rmtag="${esc(t)}" aria-label="Remove tag ${esc(t)}">${I.xs}</button>`:''}</span>`;
+const allTags=()=>[...new Set(contacts.flatMap(c=>c.tags||[]))].sort((a,b)=>a.localeCompare(b));
+
+/* ---------- Toast ---------- */
+const toastEl=$('#toast');let tt;
+function toast(msg,label,fn){
+  toastEl.innerHTML=`<span>${esc(msg)}</span>${label?`<button type="button">${esc(label)}</button>`:''}`;
+  if(label) toastEl.querySelector('button').onclick=()=>{fn();toastEl.classList.remove('show')};
+  toastEl.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>toastEl.classList.remove('show'),label?6000:2400);
+}
+
+/* ---------- Login ---------- */
+const authEl=$('#auth'),appEl=$('#app'),stepEl=$('#authStep');
+const BAND_CITIES=[['Gold Coast','Australia/Brisbane'],['Sydney','Australia/Sydney'],['Perth','Australia/Perth'],['Los Angeles','America/Los_Angeles'],['Chicago','America/Chicago'],['New York','America/New_York']];
+function drawBands(){
+  const now=new Date(),viewOff=-now.getTimezoneOffset(),nowMin=now.getHours()*60+now.getMinutes(),pct=m=>(m/1440*100).toFixed(2)+'%';
+  const axis=['12 am','6 am','12 pm','6 pm','12 am'].map((l,i)=>`<span style="left:${i*25}%">${l}</span>`).join('');
+  const rows=BAND_CITIES.map(([city,tz])=>{
+    const t=theirTime(tz,now),diff=tzOffsetMin(tz)-viewOff;
+    let s=((9*60-diff)%1440+1440)%1440,e=s+600;
+    const segs=e<=1440?[[s,e]]:[[s,1440],[0,e-1440]];
+    const live=t.ok;
+    return `<div class="bcity"><strong>${city}</strong><span>${t.time}${t.weekend?', weekend':''}</span></div>
+      <div class="track" title="${city}: ${t.label.replace(' there','')}">${t.weekend?'':segs.map(([a,b])=>`<div class="seg-b ${live&&nowMin>=a&&nowMin<b?'live':''}" style="left:${pct(a)};width:${pct(b-a)}"></div>`).join('')}<div class="nowline" style="left:${pct(nowMin)}"></div></div>`;
+  }).join('');
+  $('#bands').innerHTML=`<div></div><div class="axis">${axis}</div>${rows}`;
+}
+function stepStart(){
+  stepEl.innerHTML=`<h1>Sign in</h1><p class="sub">Welcome back. Use your work account.</p>
+  <button class="gbtn" id="gBtn" type="button">${GLOGO}Continue with Google</button>
+  <div class="or">or use email</div>
+  <form id="emailForm" novalidate>
+    <label class="flabel" for="em">Work email</label>
+    <input id="em" type="email" autocomplete="email" placeholder="you@${DOMAIN}">
+    <p class="err" id="emErr" hidden></p>
+    <button class="btn primary lg">Continue</button>
+  </form>
+  <div class="demo"><span>Preview account<br><strong>${DEMO_EMAIL}</strong>, code <strong>${DEMO_CODE}</strong></span><button class="linkbtn" type="button" id="demoFill">Fill in</button></div>`;
+  $('#gBtn').onclick=stepChooser;
+  $('#demoFill').onclick=()=>{$('#em').value=DEMO_EMAIL;$('#em').focus()};
+  $('#emailForm').onsubmit=e=>{
+    e.preventDefault();const v=$('#em').value.trim().toLowerCase(),er=$('#emErr');
+    if(!isEmail(v)){er.textContent='Enter a valid email address.';er.hidden=false;return}
+    if(!v.endsWith('@'+DOMAIN)){er.textContent='Only @'+DOMAIN+' accounts can sign in. Ask your manager for an invite.';er.hidden=false;return}
+    if(v!==DEMO_EMAIL){er.textContent='In this preview, use '+DEMO_EMAIL+'.';er.hidden=false;return}
+    stepCode(v,false);
+  };
+}
+function stepChooser(){
+  stepEl.innerHTML=`<button class="linkbtn back" id="bk" type="button">${I.left}Back</button>
+  <h1>Choose an account</h1><p class="sub">to continue to Agency Builder CRM</p>
+  <ul class="acct">
+    <li><button data-acc="${DEMO_EMAIL}"><span class="av" style="--h:#2D4FC4">AN</span><span>Ali Nawaz<small>${DEMO_EMAIL}</small></span></button></li>
+    <li><button data-acc="ali.nawaz.dev@gmail.com"><span class="av">AN</span><span>Ali Nawaz<small>ali.nawaz.dev@gmail.com</small></span></button></li>
+  </ul>
+  <p class="err" id="accErr" hidden></p>`;
+  $('#bk').onclick=stepStart;
+  stepEl.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>{
+    const a=b.dataset.acc;
+    if(!a.endsWith('@'+DOMAIN)){const e=$('#accErr');e.textContent='That account isn’t part of this workspace. Choose your @'+DOMAIN+' account.';e.hidden=false;return}
+    stepCode(a,true);
+  });
+}
+function stepCode(email,google){
+  stepEl.innerHTML=`<button class="linkbtn back" id="bk" type="button">${I.left}Back</button>
+  <h1>${google?'Confirm it’s you':'Check your email'}</h1>
+  <p class="sub">${google?'New device, so one more step. ':''}We sent a 6 digit code to <strong>${esc(email)}</strong>.</p>
+  <div class="otp" id="otp">${'<input inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit">'.repeat(3)}<span class="gap"></span>${'<input inputmode="numeric" maxlength="1" aria-label="Digit">'.repeat(3)}</div>
+  <p class="err" id="otpErr" hidden></p>
+  <div id="okState"></div>
+  <label class="check"><input type="checkbox" checked> Trust this device for 30 days</label>
+  <p class="fine">Didn’t get it? <button class="linkbtn" id="resend" type="button" disabled>Resend in 30s</button></p>`;
+  $('#bk').onclick=()=>{clearInterval(timer);stepStart()};
+  const boxes=[...stepEl.querySelectorAll('#otp input')],otpEl=$('#otp'),er=$('#otpErr');
+  boxes[0].focus();
+  const code=()=>boxes.map(b=>b.value).join('');
+  boxes.forEach((b,i)=>{
+    b.addEventListener('input',()=>{otpEl.classList.remove('bad');b.value=b.value.replace(/\D/g,'').slice(-1);if(b.value&&i<5)boxes[i+1].focus();if(code().length===6)verify()});
+    b.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!b.value&&i>0)boxes[i-1].focus()});
+    b.addEventListener('paste',e=>{const t=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);if(!t)return;e.preventDefault();t.split('').forEach((c,j)=>boxes[j].value=c);boxes[Math.min(t.length,5)].focus();if(t.length===6)verify()});
+  });
+  let left=30;const rs=$('#resend');
+  const timer=setInterval(()=>{left--;if(left<=0){rs.disabled=false;rs.textContent='Resend code'}else rs.textContent='Resend in '+left+'s'},1000);
+  rs.onclick=()=>{toast('New code sent');rs.disabled=true;left=30};
+  let tries=0,busy=false;
+  function verify(){
+    if(busy)return;
+    if(code()!==DEMO_CODE){
+      tries++;otpEl.classList.add('bad');boxes.forEach(b=>b.value='');
+      if(tries>=3){er.textContent='3 wrong codes, so sign in is paused. The real app pauses for 15 minutes. This preview unlocks in 30 seconds.';boxes.forEach(b=>b.disabled=true);
+        setTimeout(()=>{tries=0;boxes.forEach(b=>b.disabled=false);er.hidden=true;otpEl.classList.remove('bad');boxes[0].focus()},30000)}
+      else{er.textContent='That code didn’t match. '+(3-tries)+(3-tries===1?' try':' tries')+' left.';boxes[0].focus()}
+      er.hidden=false;return;
+    }
+    busy=true;er.hidden=true;boxes.forEach(b=>b.disabled=true);
+    $('#okState').innerHTML=`<p class="ok-state">${I.check}Verified. Signing you in.</p>`;
+    setTimeout(()=>{clearInterval(timer);enterApp()},700);
+  }
+}
+function enterApp(){
+  authEl.hidden=true;appEl.hidden=false;
+  if(!location.hash) history.replaceState(null,'','#dashboard');
+  render();
+}
+$('#signOut').onclick=()=>{closeDrawer();closeChat();appEl.hidden=true;authEl.hidden=false;stepStart()};
+
+/* ---------- Filters and saved views ---------- */
+const DUE_OPTS=[['any','Any due date'],['overdue','Overdue'],['today','Due today'],['week','Due in 7 days'],['none','No next step']];
+const FILTER_DEFAULTS={owner:'all',due:'any',source:'all',tag:'all',cold:false,cpipe:'all',cstage:'all'};
+function passFilters(d,c){
+  if(state.owner!=='all'&&d.owner!==state.owner)return false;
+  if(state.source!=='all'&&c.source!==state.source)return false;
+  if(state.tag!=='all'&&!(c.tags||[]).includes(state.tag))return false;
+  if(state.cold&&!(isOpen(d)&&dayDiff(d.touched)<=-5))return false;
+  const n=d.due?dayDiff(d.due):null;
+  if(state.due==='overdue')return isOpen(d)&&n!=null&&n<0;
+  if(state.due==='today')return isOpen(d)&&n===0;
+  if(state.due==='week')return isOpen(d)&&n!=null&&n>=0&&n<=6;
+  if(state.due==='none')return isOpen(d)&&!d.due;
+  return true;
+}
+function activeCount(withContacts){
+  const base=[state.owner!=='all',state.due!=='any',state.source!=='all',state.tag!=='all',state.cold];
+  if(withContacts)base.push(state.cpipe!=='all',state.cstage!=='all');
+  return base.filter(Boolean).length;
+}
+function filterBar(extra,withContacts){
+  const on=b=>b?'class="on"':'';
+  return `<div class="filters" role="group" aria-label="Filters">${extra||''}
+    <select data-filter="owner" aria-label="Owner" ${on(state.owner!=='all')}><option value="all">Owner</option>${ownerOpts(state.owner)}</select>
+    <select data-filter="due" aria-label="Due date" ${on(state.due!=='any')}>${DUE_OPTS.map(([v,l])=>`<option value="${v}" ${state.due===v?'selected':''}>${v==='any'?'Due date':l}</option>`).join('')}</select>
+    <select data-filter="source" aria-label="Source" ${on(state.source!=='all')}><option value="all">Source</option>${SOURCES.map(s=>`<option ${state.source===s?'selected':''}>${s}</option>`).join('')}</select>
+    <select data-filter="tag" aria-label="Tag" ${on(state.tag!=='all')}><option value="all">Tag</option>${allTags().map(t=>`<option ${state.tag===t?'selected':''}>${esc(t)}</option>`).join('')}</select>
+    <button class="fchip" data-cold aria-pressed="${state.cold}" title="Open deals with no contact in 5 days or more">Going cold</button>
+    ${activeCount(withContacts)?'<button class="linkbtn" data-clearf>Clear</button>':''}
+  </div>`;
+}
+const SAVED=[
+  {id:'hot',label:'Hot deals',route:'pipeline',set:{tag:'Hot'},h:'#B4433A'},
+  {id:'cold',label:'Going cold',route:'pipeline',set:{cold:true},h:'#0F7C86'},
+  {id:'nostep',label:'No next step',route:'contacts',set:{due:'none'},h:'#B7791F'},
+  {id:'overdue',label:'Overdue',route:'contacts',set:{due:'overdue'},h:'#7A3FB8'}
+];
+const viewMatches=(v,route)=>v.route===route&&Object.keys(FILTER_DEFAULTS).every(k=>state[k]===(k in v.set?v.set[k]:FILTER_DEFAULTS[k]));
+function applyView(id){const v=SAVED.find(x=>x.id===id);Object.assign(state,FILTER_DEFAULTS,v.set);if(location.hash!=='#'+v.route)location.hash='#'+v.route;else render()}
+
+/* ---------- Views ---------- */
+const viewEl=$('#view'),navEl=$('#nav');
+const NAV=[['dashboard','Dashboard'],['pipeline','Pipeline'],['contacts','Contacts'],['projects','Projects'],['security','Security']];
+function queueOf(scope){return deals.filter(d=>isOpen(d)&&d.due&&dayDiff(d.due)<=0&&(scope!=='mine'||d.owner===ME)).sort((a,b)=>a.due-b.due)}
+
+function renderCalls(){
+  const queue=queueOf(state.scope),team=state.scope==='team';
+  const over=queue.filter(d=>dayDiff(d.due)<0),today=queue.filter(d=>dayDiff(d.due)===0);
+  const row=d=>{
+    const c=byC(d.cid),t=theirTime(c.tz),n=dayDiff(d.due);
+    return `<li class="qrow" data-open="${c.id}" tabindex="0">
+      <div class="q-when ${n<0?'late':''}">${n<0?(-n)+'d late':tm(d.due)}</div>
+      <div class="q-who"><strong>${esc(c.name)}</strong><em>${esc(c.company||'Agency lead')}</em><span>${esc(d.next||'No next step set')}</span></div>
+      <div class="q-tz" title="${t.label}"><span class="dot ${t.ok?'ok':''}"></span>${t.time} their time</div>
+      <div class="q-meta">${team?avatar(d.owner):''}</div>
+      <div class="q-act"><button class="btn sm" data-log="${d.id}">Log call</button></div>
+    </li>`};
+  const block=(title,list,cls)=>list.length?`<div class="grp"><h2 class="${cls||''}">${title}</h2><span>${list.length}</span></div><ol class="list">${list.map(row).join('')}</ol>`:'';
+  return `<div class="calls">
+  <div class="ph"><h1>Calls</h1><span class="meta">${NOW.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span>
+    <div class="acts"><div class="seg" role="group" aria-label="Whose calls"><button data-scope="mine" aria-pressed="${!team}">Mine</button><button data-scope="team" aria-pressed="${team}">Team</button></div></div></div>
+  ${block('Overdue',over,'late')}${block('Today',today)}
+  ${queue.length?'':`<div class="list empty">${team?'No calls due today.':'Nothing on your list today.'}</div>`}
+  </div>`;
+}
+
+function renderPipeline(){
+  if(!PIPES[state.pipe])state.pipe=Object.keys(PIPES)[0];
+  const P=PIPES[state.pipe];
+  if(!deals.length)return `<div class="ph"><h1>Pipeline</h1></div>`+emptyState('Your pipeline is empty','Add a contact and their deal shows up here.');
+  const all=deals.filter(d=>d.pipe===state.pipe);
+  const list=all.filter(d=>passFilters(d,byC(d.cid)));
+  const open=list.filter(isOpen);
+  const cols=P.stages.map(s=>{
+    const ds=list.filter(d=>d.stage===s),total=ds.reduce((a,d)=>a+d.value,0),cls=s==='Won'?'won':s==='Lost'?'lost':'';
+    return `<section class="col">
+      <header><span class="st ${cls||stageCls({pipe:state.pipe,stage:s})}"><i></i>${esc(s)}</span><span class="col-count">${ds.length}</span><span class="col-sum">${ds.length?short(total):''}</span></header>
+      <div class="col-body" data-drop="${esc(s)}">${ds.map(d=>{const c=byC(d.cid),n=d.due?dayDiff(d.due):null;return `<article class="card" draggable="true" data-deal="${d.id}" data-open="${c.id}" tabindex="0" aria-label="${esc(c.name)}">
+        <div class="card-top"><strong>${esc(c.name)}</strong>${avatar(d.owner)}</div>
+        <div class="card-co">${esc(c.company||'Agency lead, '+cityShort(c.city))}</div>
+        ${c.tags&&c.tags.length?`<div class="tags">${c.tags.slice(0,2).map(t=>tagEl(t)).join('')}${c.tags.length>2?`<span class="tag" style="--h:#74746D">+${c.tags.length-2}</span>`:''}</div>`:''}
+        <div class="card-foot"><span class="val">${money(d.value)}</span><span class="due ${n!=null&&n<0?'late':''}">${isOpen(d)?fmtDue(d.due):''}</span></div>
+      </article>`}).join('')||'<p class="col-empty">No deals</p>'}</div>
+    </section>`}).join('');
+  const fil=activeCount(false);
+  return `<div class="ph"><h1>Pipeline</h1><span class="meta">${fil?`${list.length} of ${all.length} deals`:`${open.length} open, ${money(open.reduce((a,d)=>a+d.value,0))}`}</span>
+    <div class="acts"><div class="seg" role="group" aria-label="Pipeline">${Object.entries(PIPES).map(([k,p])=>`<button data-pipe="${k}" aria-pressed="${state.pipe===k}">${esc(p.short||p.name)}</button>`).join('')}</div>
+    <div class="seg" role="group" aria-label="Layout"><button data-pview="board" aria-pressed="${state.pview==='board'}">Board</button><button data-pview="list" aria-pressed="${state.pview==='list'}">List</button></div>
+    <button class="btn sm" data-editpipes>Edit stages</button></div></div>
+  ${filterBar('',false)}
+  ${state.pview==='list'?pipeList(list,P):`<div class="board-wrap"><div class="board">${cols}</div></div>`}`;
+}
+function pipeList(list,P){
+  const dueKey=d=>d.due&&isOpen(d)?+d.due:9e15;
+  const groups=P.stages.map(s=>({s,ds:list.filter(d=>d.stage===s).sort((a,b)=>dueKey(a)-dueKey(b))})).filter(g=>g.ds.length);
+  if(!groups.length)return '<div class="list empty">No deals match these filters.</div>';
+  return `<div class="table-wrap"><table>
+    <thead><tr><th>Name</th><th>Business</th><th>Owner</th><th>Next step</th><th>Their time</th><th class="num">Value</th></tr></thead>
+    ${groups.map(g=>`<tbody><tr class="grow"><td colspan="6"><span class="st ${stageCls(g.ds[0])}"><i></i>${esc(g.s)}</span><span class="muted">${g.ds.length}</span><span class="gsum">${money(g.ds.reduce((a,d)=>a+d.value,0))}</span></td></tr>
+    ${g.ds.map(d=>{const c=byC(d.cid),t=theirTime(c.tz),n=d.due?dayDiff(d.due):null,tg=c.tags||[];return `<tr data-open="${c.id}" tabindex="0">
+      <td><strong>${esc(c.name)}</strong>${tg.length?`<span class="tags">${tg.map(x=>tagEl(x)).join('')}</span>`:''}</td>
+      <td>${esc(c.company||'Agency lead')}<span class="sub2">${esc(c.city)}</span></td>
+      <td>${avatar(d.owner)}</td>
+      <td>${isOpen(d)?`${esc(d.next||'None')}<span class="sub2 due ${n!=null&&n<0?'late':''}">${fmtDue(d.due)}</span>`:'<span class="muted">Closed</span>'}</td>
+      <td><span class="tz-cell" title="${t.label}"><span class="dot ${t.ok?'ok':''}"></span>${t.time}</span></td>
+      <td class="num">${money(d.value)}</td>
+    </tr>`}).join('')}</tbody>`).join('')}
+  </table></div>`;
+}
+
+const stageIdx=d=>PIPES[d.pipe].stages.indexOf(d.stage);
+const cmp=(x,y)=>x===y?0:x<y?-1:1;
+const SORTS={name:(a,b)=>a.c.name.localeCompare(b.c.name),business:(a,b)=>(a.c.company||'zzz').localeCompare(b.c.company||'zzz'),stage:(a,b)=>cmp(stageIdx(a.d),stageIdx(b.d)),owner:(a,b)=>TEAM[a.d.owner].name.localeCompare(TEAM[b.d.owner].name),next:(a,b)=>cmp(a.d.due&&isOpen(a.d)?+a.d.due:9e15,b.d.due&&isOpen(b.d)?+b.d.due:9e15),value:(a,b)=>cmp(a.d.value,b.d.value)};
+function th(key,label,cls){const on=state.sort.key===key;return `<th class="${cls||''}" ${on?`aria-sort="${state.sort.dir>0?'ascending':'descending'}"`:''}><button data-sort="${key}">${label}${on?(state.sort.dir>0?I.sortUp:I.sortDown):''}</button></th>`}
+function renderContacts(){
+  if(!contacts.length)return `<div class="ph"><h1>Contacts</h1><span class="meta">0</span></div>`+emptyState('No contacts yet','Add contacts one by one. A CSV import comes in the real build.');
+  const q=state.q.trim().toLowerCase();
+  if(state.cpipe!=='all'&&!PIPES[state.cpipe]){state.cpipe='all';state.cstage='all'}
+  let rows=contacts.map(c=>({c,d:dealOf(c.id)})).filter(r=>r.d);
+  if(state.cpipe!=='all') rows=rows.filter(r=>r.d.pipe===state.cpipe);
+  if(state.cstage!=='all') rows=rows.filter(r=>r.d.stage===state.cstage);
+  rows=rows.filter(({c,d})=>passFilters(d,c));
+  if(q) rows=rows.filter(({c})=>[c.name,c.company,c.city,c.email,...(c.tags||[])].join(' ').toLowerCase().includes(q));
+  rows.sort((a,b)=>SORTS[state.sort.key](a,b)*state.sort.dir);
+  const fil=activeCount(true);
+  const on=b=>b?'class="on"':'';
+  const extra=`<select data-filter="cpipe" aria-label="Pipeline" ${on(state.cpipe!=='all')}><option value="all">Pipeline</option>${Object.entries(PIPES).map(([k,p])=>`<option value="${k}" ${state.cpipe===k?'selected':''}>${esc(p.name)}</option>`).join('')}</select>
+    ${state.cpipe!=='all'?`<select data-filter="cstage" aria-label="Stage" ${on(state.cstage!=='all')}><option value="all">Stage</option>${PIPES[state.cpipe].stages.map(s=>`<option ${state.cstage===s?'selected':''}>${esc(s)}</option>`).join('')}</select>`:''}`;
+  return `<div class="ph"><h1>Contacts</h1><span class="meta">${fil||q?`${rows.length} of ${contacts.length}`:contacts.length}</span>
+    ${q?`<span class="meta">matching “${esc(state.q)}”</span><button class="linkbtn" data-clearq>Clear search</button>`:''}</div>
+  ${filterBar(extra,true)}
+  <div class="table-wrap"><table>
+    <thead><tr>${th('name','Name')}${th('business','Business')}<th>Their time</th>${th('stage','Stage')}${th('owner','Owner')}${th('next','Next step')}${th('value','Value','num')}</tr></thead>
+    <tbody>${rows.map(({c,d})=>{const t=theirTime(c.tz),n=d.due?dayDiff(d.due):null;return `<tr data-open="${c.id}" tabindex="0">
+      <td><strong>${esc(c.name)}</strong>${c.tags&&c.tags.length?`<span class="tags">${c.tags.map(t=>tagEl(t)).join('')}</span>`:`<span class="sub2">${esc(c.email)}</span>`}</td>
+      <td>${esc(c.company||'Agency lead')}<span class="sub2">${esc(c.city)}</span></td>
+      <td><span class="tz-cell" title="${t.label}"><span class="dot ${t.ok?'ok':''}"></span>${t.time}</span></td>
+      <td>${stage(d)}<span class="sub2">${esc(PIPES[d.pipe].short||PIPES[d.pipe].name)}</span></td>
+      <td>${avatar(d.owner)}</td>
+      <td>${isOpen(d)?`${esc(d.next||'None')}<span class="sub2 due ${n!=null&&n<0?'late':''}">${fmtDue(d.due)}</span>`:'<span class="muted">Closed</span>'}</td>
+      <td class="num">${money(d.value)}</td>
+    </tr>`}).join('')||`<tr><td colspan="7" class="empty">No contacts match these filters.</td></tr>`}</tbody>
+  </table></div>`;
+}
+
+function renderProjects(){
+  if(!projects.length)return `<div class="ph"><h1>Projects</h1></div><div class="list empty">No projects yet. Mark a deal as won to start one.</div>`;
+  const active=projects.filter(p=>p.stage!=='Live').length;
+  return `<div class="ph"><h1>Projects</h1><span class="meta">${active} in progress</span></div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Project</th><th>Type</th><th>Stage</th><th>Owner</th><th>Due</th><th>Progress</th></tr></thead>
+    <tbody>${projects.map(p=>{const done=p.tasks.filter(t=>t[1]).length,pct=Math.round(done/p.tasks.length*100),n=dayDiff(p.due);return `<tr data-proj="${p.id}" tabindex="0">
+      <td><strong>${esc(p.name)}</strong><span class="sub2">${esc(p.client)}</span></td>
+      <td>${esc((PIPES[p.type]||{}).short||'')}</td>
+      <td>${pstage(p.stage)}</td>
+      <td>${avatar(p.owner)}</td>
+      <td>${p.stage==='Live'?'<span class="muted">Delivered</span>':n<0?`<span class="due late">${-n}d late</span>`:n===0?'Today':'In '+n+' days'}</td>
+      <td><div class="prog"><div class="bar ${pct===100?'done':''}"><i style="width:${pct}%"></i></div>${done}/${p.tasks.length}</div></td>
+    </tr>`}).join('')}</tbody>
+  </table></div>`;
+}
+
+/* Dashboard */
+const SRC_COL=['#2D4FC4','#1F7A4E','#B7791F','#7A3FB8','#0F7C86'];
+const niceMax=m=>{const p=Math.pow(10,Math.floor(Math.log10(m)));const n=m/p;return (n<=2?2:n<=5?5:10)*p};
+function closedAll(){return [...HISTORY,...deals.filter(d=>!isOpen(d)).map(d=>({pipe:d.pipe,value:d.value,owner:d.owner,source:(byC(d.cid)||{}).source,won:d.stage==='Won',closedAt:d.closedAt||d.touched}))]}
+function renderDashboard(){
+  if(!deals.length&&!HISTORY.length)return `<div class="ph"><h1>Dashboard</h1></div>`+emptyState('No deals yet','Add your first contact, or load sample data to see how the dashboard works.');
+  if(state.dpipe!=='all'&&!PIPES[state.dpipe])state.dpipe='all';
+  const pf=state.dpipe,inP=x=>pf==='all'||x.pipe===pf;
+  const closed=closedAll().filter(inP),open=deals.filter(d=>isOpen(d)&&inP(d));
+  const sum=a=>a.reduce((s,x)=>s+x.value,0),ago=x=>-dayDiff(x.closedAt);
+  const won=closed.filter(x=>x.won),w30=won.filter(x=>ago(x)<=30),wPrev=won.filter(x=>ago(x)>30&&ago(x)<=60);
+  const c30=closed.filter(x=>ago(x)<=30);
+  const rate=c30.length?Math.round(c30.filter(x=>x.won).length/c30.length*100):0;
+  const avg=w30.length?Math.round(sum(w30)/w30.length):0;
+  const delta=sum(wPrev)?Math.round((sum(w30)-sum(wPrev))/sum(wPrev)*100):null;
+  const weeks=Array.from({length:8},(_,i)=>{const k=7-i,list=won.filter(x=>Math.floor(ago(x)/7)===k);return {k,v:sum(list),n:list.length,label:k===0?'This week':at(-(k*7+6),0).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}});
+  const top=niceMax(Math.max(...weeks.map(w=>w.v),1000));
+  const W=640,H=210,L=44,B=24,T=18,bw=(W-L)/8,ph=H-B-T;
+  const grid=[0,top/2,top].map(v=>{const y=H-B-v/top*ph;return `<line class="gl" x1="${L}" x2="${W}" y1="${y}" y2="${y}"/><text class="ax" x="${L-8}" y="${y+4}" text-anchor="end">${short(v)}</text>`}).join('');
+  const bars=weeks.map((w,i)=>{const h=w.v/top*ph,x=L+i*bw+bw*.2,y=H-B-h,cx=L+i*bw+bw/2;return `<g><title>${w.label}: ${money(w.v)}, ${w.n} ${w.n===1?'deal':'deals'}</title><rect class="b ${w.k===0?'now':''}" x="${x}" y="${y}" width="${bw*.6}" height="${Math.max(h,0)}" rx="3"/>${w.v?`<text class="bl" x="${cx}" y="${y-6}" text-anchor="middle">${short(w.v)}</text>`:''}<text class="ax" x="${cx}" y="${H-6}" text-anchor="middle">${w.label}</text></g>`}).join('');
+  const keys=pf==='all'?Object.keys(PIPES):[pf];
+  const fun=keys.map(k=>({k,rows:openStages(k).map(s=>{const ds=deals.filter(d=>d.pipe===k&&d.stage===s);return {s,n:ds.length,v:sum(ds)}})}));
+  const fmax=Math.max(1,...fun.flatMap(f=>f.rows.map(r=>r.n)));
+  const src=SOURCES.map((s,i)=>{const cs=closed.filter(x=>x.source===s);return {s,n:open.filter(d=>(byC(d.cid)||{}).source===s).length+cs.length,col:SRC_COL[i],rate:cs.length?Math.round(cs.filter(x=>x.won).length/cs.length*100):null}}).filter(x=>x.n);
+  const tot=src.reduce((a,x)=>a+x.n,0)||1,R=54,C=2*Math.PI*R;let off=0;
+  const arcs=src.map(x=>{const len=x.n/tot*C,l=Math.max(len-2,0);const el=`<circle cx="66" cy="66" r="${R}" fill="none" style="stroke:${x.col}" stroke-width="16" stroke-dasharray="${l} ${C-l}" stroke-dashoffset="${-off}" transform="rotate(-90 66 66)"><title>${x.s}: ${x.n}</title></circle>`;off+=len;return el}).join('');
+  const reps=Object.entries(TEAM).filter(([k])=>CALLS_BASE[k]!=null||deals.some(d=>d.owner===k)).map(([k,u])=>{const ww=w30.filter(x=>x.owner===k);return {k,name:u.name,v:sum(ww),calls:(CALLS_BASE[k]||0)+acts.filter(a=>a.type==='call'&&a.by===k&&dayDiff(a.when)>=-6).length}}).sort((a,b)=>b.v-a.v);
+  const rmax=Math.max(1,...reps.map(r=>r.v));
+  return `<div class="ph"><h1>Dashboard</h1><span class="meta">Last 30 days</span>
+    <div class="acts"><div class="seg" role="group" aria-label="Pipeline"><button data-dpipe="all" aria-pressed="${pf==='all'}">All</button>${Object.entries(PIPES).map(([k,p])=>`<button data-dpipe="${k}" aria-pressed="${pf===k}">${esc(p.short||p.name)}</button>`).join('')}</div></div></div>
+  <dl class="kpis">
+    <div><dt>Won</dt><dd>${money(sum(w30))}${delta==null?'':`<small class="${delta>=0?'up':'down'}">${delta>=0?'+':''}${delta}%</small>`}</dd></div>
+    <div><dt>Open pipeline</dt><dd>${money(sum(open))}<small class="muted">${open.length} deals</small></dd></div>
+    <div><dt>Close rate</dt><dd>${rate}%</dd></div>
+  </dl>
+  <div class="dash">
+    <section class="chart span2"><div class="chart-h"><h2>Revenue won by week</h2><span>${money(sum(weeks))} over 8 weeks</span></div>
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Revenue won by week">${grid}${bars}</svg></section>
+    <section class="chart"><div class="chart-h"><h2>Open deals by stage</h2><span>${open.length} deals</span></div>
+      ${fun.map(f=>{
+        const tv=f.rows.reduce((a,r)=>a+r.v,0),m=f.rows.length;
+        const shade=i=>`color-mix(in srgb,var(--accent) ${Math.round(22+78*(m>1?i/(m-1):1))}%,var(--surface))`;
+        return `<div class="stg"><div class="stg-h"><span>${esc(PIPES[f.k].short||PIPES[f.k].name)}</span><strong>${money(tv)}</strong></div>
+        <div class="stg-bar" role="img" aria-label="Open value by stage">${f.rows.map((r,i)=>r.v?`<i style="flex:${r.v};background:${shade(i)}" title="${esc(r.s)}: ${money(r.v)}"></i>`:'').join('')}</div>
+        <ul class="stg-list">${f.rows.map((r,i)=>`<li><button type="button" data-stagego="${f.k}" ${r.n?'':'class="zero"'} title="Open ${esc(r.s)} in the pipeline"><i style="background:${shade(i)}"></i><span>${esc(r.s)}</span><span class="c">${r.n}</span><span class="v">${short(r.v)}</span></button></li>`).join('')}</ul></div>`;
+      }).join('')}</section>
+  </div>`;
+}
+
+const settings={google:true,email:true,newDevice:true,lockout:true};
+const sw=k=>`<label class="switch"><input type="checkbox" role="switch" data-setting="${k}" ${settings[k]?'checked':''} aria-label="${k}"><span></span></label>`;
+function renderSecurity(){
+  return `<div class="ph"><h1>Security</h1></div>
+  <section class="panel"><h2>Sign in</h2>
+    <div class="srow"><div><strong>Google sign in</strong><p>Team members use their work Google account.</p></div>${sw('google')}</div>
+    <div class="srow"><div><strong>Email code</strong><p>A 6 digit code sent to their work email. Expires after 10 minutes.</p></div>${sw('email')}</div>
+    <div class="srow"><div><strong>Allowed domain</strong><p>Every other account is blocked, even with a valid Google login.</p></div><code>${DOMAIN}</code></div>
+    <div class="srow"><div><strong>Code on new devices</strong><p>Google sign in from a new device also needs an email code.</p></div>${sw('newDevice')}</div>
+    <div class="srow"><div><strong>Pause after wrong codes</strong><p>3 wrong codes pauses sign in for 15 minutes and alerts admins.</p></div>${sw('lockout')}</div>
+    <div class="srow"><div><strong>Sign out when idle</strong><p>Ends a session after no activity.</p></div><select data-idle aria-label="Idle timeout"><option>12 hours</option><option>24 hours</option><option>7 days</option></select></div>
+  </section>
+  <section class="panel">
+    <div class="panel-head"><h2>Team</h2><button class="btn sm" id="inviteBtn">Invite</button></div>
+    <p class="muted small note">Admins see everything and can export. Managers see the whole team. Closers and setters edit only their own deals.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Name</th><th>Role</th><th>Last active</th><th>Status</th></tr></thead>
+      <tbody>${Object.entries(TEAM).map(([k,u])=>`<tr>
+        <td><div style="display:flex;gap:10px;align-items:center">${avatar(k)}<div><strong>${esc(u.name)}</strong><span class="sub2">${esc(u.email)}</span></div></div></td>
+        <td>${k===ME?'Admin <span class="muted small">(you)</span>':`<select data-role="${k}" aria-label="Role for ${esc(u.name)}">${ROLES.map(r=>`<option ${r===u.role?'selected':''}>${r}</option>`).join('')}</select>`}</td>
+        <td>${esc(u.last)}</td>
+        <td><span class="st ${u.status==='Active'?'won':'mid'}"><i></i>${u.status}</span></td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+  </section>
+  <section class="panel"><h2>Your sessions</h2>
+    ${sessions.map((s,i)=>`<div class="srow"><div><strong>${s.device}</strong><p>${s.where}, ${s.when}</p></div>${s.current?'<span class="st won"><i></i>This device</span>':`<button class="btn sm" data-session="${i}">Sign out</button>`}</div>`).join('')}
+  </section>
+  <section class="panel"><h2>Activity log</h2>
+    <ul class="log">${auditLog.map(a=>`<li class="${a[2]||''}"><span>${esc(a[0])}</span><span>${a[1]}</span></li>`).join('')}</ul>
+  </section>
+  <p class="howto">In the real build, Supabase Auth runs Google sign in and email codes, and row level security means a setter’s browser can only load what their role allows.</p>
+  <section class="panel" style="margin-top:16px"><h2>Workspace data</h2>
+    <div class="srow"><div><strong>Sample data</strong><p>Fills the CRM with made up contacts and deals so you can explore. Replaces what’s there now.</p></div><button class="btn sm" data-sample>Load sample data</button></div>
+    <div class="srow"><div><strong>Clear everything</strong><p>Deletes all contacts, deals and projects saved in this browser.</p></div><button class="btn sm danger" data-reset>Clear all data</button></div>
+  </section>`;
+}
+
+const VIEWS={dashboard:renderDashboard,pipeline:renderPipeline,contacts:renderContacts,projects:renderProjects,security:renderSecurity};
+function render(){
+  let v=location.hash.slice(1)||'dashboard';if(!VIEWS[v])v='dashboard';
+  const counts={dashboard:'',calls:queueOf('team').length,pipeline:deals.filter(isOpen).length,contacts:contacts.length,projects:projects.filter(p=>p.stage!=='Live').length,security:''};
+  navEl.innerHTML=NAV.map(([k,l])=>`<a href="#${k}" ${k===v?'aria-current="page"':''}>${I[k]}<span>${l}</span><span class="count">${counts[k]}</span></a>`).join('');
+  $('#views').innerHTML=SAVED.map(s=>`<button class="vlink" data-view="${s.id}" aria-current="${viewMatches(s,v)}"><i style="background:${s.h}"></i>${s.label}</button>`).join('');
+  viewEl.innerHTML=VIEWS[v]();
+  document.title=NAV.find(n=>n[0]===v)[1]+', Agency Builder CRM';
+  save();
+}
+function refresh(){render();if(state.drawer)renderDrawer()}
+window.addEventListener('hashchange',()=>{if(!appEl.hidden){render();$('#main').scrollTop=0}});
+$('#views').addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(b)applyView(b.dataset.view)});
+
+/* ---------- View events ---------- */
+viewEl.addEventListener('click',e=>{
+  const t=e.target;
+  const b=t.closest('[data-scope],[data-pipe],[data-pview],[data-stagego],[data-dpipe],[data-log],[data-clearq],#inviteBtn,[data-session],[data-editpipes],[data-reset],[data-sample],[data-newcontact],[data-cold],[data-clearf],[data-sort]');
+  if(b){
+    if(b.dataset.scope){state.scope=b.dataset.scope;render()}
+    else if(b.dataset.pipe){state.pipe=b.dataset.pipe;render()}
+    else if(b.dataset.dpipe){state.dpipe=b.dataset.dpipe;render()}
+    else if(b.dataset.pview){state.pview=b.dataset.pview;render()}
+    else if(b.dataset.stagego){Object.assign(state,FILTER_DEFAULTS);state.pipe=b.dataset.stagego;state.pview='list';location.hash='#pipeline'}
+    else if(b.dataset.log){logCall(b.dataset.log)}
+    else if(b.dataset.sort){const k=b.dataset.sort;state.sort=state.sort.key===k?{key:k,dir:-state.sort.dir}:{key:k,dir:k==='value'?-1:1};render()}
+    else if(b.hasAttribute('data-clearq')){state.q='';$('#q').value='';render()}
+    else if(b.id==='inviteBtn'){invite()}
+    else if(b.hasAttribute('data-editpipes')){openDrawer('pipes',state.pipe)}
+    else if(b.hasAttribute('data-reset')){openModal({title:'Clear all data',submit:'Clear everything',body:'<p class="m-sub">This deletes every contact, deal and project saved in this browser. You can’t undo this.</p>',onSubmit(){resetDemo()}})}
+    else if(b.hasAttribute('data-sample')){loadSample()}
+    else if(b.hasAttribute('data-newcontact')){newContact()}
+    else if(b.hasAttribute('data-cold')){state.cold=!state.cold;render()}
+    else if(b.hasAttribute('data-clearf')){Object.assign(state,FILTER_DEFAULTS);render()}
+    else if(b.hasAttribute('data-session')){sessions.splice(+b.dataset.session,1);auditLog.unshift(['Ali Nawaz signed out a session remotely.','Just now']);render();toast('Session signed out')}
+    return;
+  }
+  if(t.closest('button,a,select,input,textarea,label'))return;
+  const o=t.closest('[data-open]');if(o)return openDrawer('contact',o.dataset.open);
+  const p=t.closest('[data-proj]');if(p)return openDrawer('project',p.dataset.proj);
+});
+viewEl.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||e.target.closest('button,select,input,textarea'))return;
+  const o=e.target.closest('[data-open]');if(o)return openDrawer('contact',o.dataset.open);
+  const p=e.target.closest('[data-proj]');if(p)return openDrawer('project',p.dataset.proj);
+});
+viewEl.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.filter){state[t.dataset.filter]=t.value;if(t.dataset.filter==='cpipe')state.cstage='all';render()}
+  else if(t.dataset.setting){settings[t.dataset.setting]=t.checked;toast(t.checked?'Turned on':'Turned off')}
+  else if(t.dataset.role){TEAM[t.dataset.role].role=t.value;auditLog.unshift([`Ali Nawaz changed ${TEAM[t.dataset.role].name}’s role to ${t.value}.`,'Just now']);render();toast('Role updated')}
+  else if(t.hasAttribute('data-idle')){toast('Idle timeout set to '+t.value)}
+});
+viewEl.addEventListener('dragstart',e=>{const c=e.target.closest&&e.target.closest('[data-deal]');if(!c)return;e.dataTransfer.setData('text/plain',c.dataset.deal);e.dataTransfer.effectAllowed='move';c.classList.add('dragging')});
+viewEl.addEventListener('dragend',()=>{viewEl.querySelectorAll('.dragging,.over').forEach(x=>x.classList.remove('dragging','over'))});
+viewEl.addEventListener('dragover',e=>{const z=e.target.closest('[data-drop]');if(!z)return;e.preventDefault();e.dataTransfer.dropEffect='move';if(!z.classList.contains('over')){viewEl.querySelectorAll('.over').forEach(x=>x.classList.remove('over'));z.classList.add('over')}});
+viewEl.addEventListener('drop',e=>{const z=e.target.closest('[data-drop]');if(!z)return;e.preventDefault();moveStage(e.dataTransfer.getData('text/plain'),z.dataset.drop)});
+
+function moveStage(did,st){
+  const d=deals.find(x=>x.id===did);if(!d||d.stage===st)return;
+  d.stage=st;d.touched=new Date();d.closedAt=(st==='Won'||st==='Lost')?new Date():null;
+  acts.push({cid:d.cid,type:'stage',when:new Date(),by:ME,text:'Moved to '+st});
+  if(st==='Won'){d.due=null;refresh();toast('Marked as won','Start delivery project',()=>startProject(d))}
+  else if(st==='Lost'){d.due=null;refresh();toast('Marked as lost')}
+  else{refresh();toast('Moved to '+st)}
+}
+function startProject(d){
+  const c=byC(d.cid);
+  const p={id:'p'+Date.now().toString(36),client:c.company||c.name,cid:c.id,name:'New delivery project',type:d.pipe,owner:ME,stage:'Kickoff',due:at(21,17),tasks:[['Kickoff call',0],['Collect logins and access',0],['Agree the build plan',0]]};
+  projects.unshift(p);location.hash='#projects';openDrawer('project',p.id);
+}
+
+/* ---------- Drawer ---------- */
+const drawer=$('#drawer'),scrim=$('#scrim');let lastFocus;
+function openDrawer(kind,id){lastFocus=document.activeElement;state.drawer={kind,id};renderDrawer();scrim.hidden=false;drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');setTimeout(()=>{const x=drawer.querySelector('[data-close]');if(x)x.focus()},50)}
+function closeDrawer(){if(!state.drawer)return;state.drawer=null;drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');scrim.hidden=true;if(lastFocus&&document.contains(lastFocus))lastFocus.focus()}
+scrim.onclick=closeDrawer;
+function renderDrawer(){
+  const s=state.drawer;
+  if(s.kind==='contact'&&!byC(s.id)){closeDrawer();return}
+  drawer.innerHTML=s.kind==='contact'?contactDrawer(s.id):s.kind==='pipes'?pipesDrawer(s.id):projectDrawer(s.id);
+}
+const TLABEL={call:'Call',email:'Email',note:'Note',stage:'Stage',added:'Created'};
+function contactDrawer(cid){
+  const c=byC(cid),d=dealOf(cid),t=theirTime(c.tz),n=d.due?dayDiff(d.due):null;
+  const items=acts.filter(a=>a.cid===cid).sort((a,b)=>b.when-a.when);
+  return `<header class="dr-head"><span class="av lg" style="--h:${hue(c.name)}">${ini(c.name)}</span>
+    <div class="dr-title"><h2>${esc(c.name)}</h2><p>${esc(c.company||'Agency lead')}, ${esc(c.city)}</p></div>
+    <button class="icon-btn" data-close aria-label="Close">${I.x}</button></header>
+  <div class="dr-actions">
+    <button class="btn sm primary" data-log="${d.id}">Log call</button>
+    <a class="btn sm" href="tel:${c.phone.replace(/[^\d+]/g,'')}">${I.phone}Call</a>
+    <a class="btn sm" href="mailto:${esc(c.email)}">${I.mail}Email</a>
+    <button class="btn sm" data-askabout="${cid}">${I.ask}Ask about ${esc(first(c.name))}</button>
+  </div>
+  <p class="tz-line"><span class="dot ${t.ok?'ok':''}"></span>${t.time} for ${esc(first(c.name))}. ${t.label}.</p>
+  <div class="tag-edit">
+    ${c.tags.length?`<div class="tags">${c.tags.map(x=>tagEl(x,true)).join('')}</div>`:''}
+    <form class="tag-form" data-addtag="${cid}"><input name="t" list="tagList" placeholder="Add a tag" aria-label="Add a tag" autocomplete="off"><datalist id="tagList">${allTags().filter(x=>!c.tags.includes(x)).map(x=>`<option value="${esc(x)}">`).join('')}</datalist></form>
+  </div>
+  <dl class="fields">
+    <div><dt>Stage</dt><dd><select data-field="stage" aria-label="Stage">${PIPES[d.pipe].stages.map(s=>`<option ${s===d.stage?'selected':''}>${esc(s)}</option>`).join('')}</select></dd></div>
+    <div><dt>Owner</dt><dd><select data-field="owner" aria-label="Owner">${ownerOpts(d.owner)}</select></dd></div>
+    <div><dt>Deal value (USD)</dt><dd><input data-field="value" inputmode="numeric" value="${d.value}" aria-label="Deal value"></dd></div>
+    <div><dt>Pipeline</dt><dd><select data-field="pipe" aria-label="Pipeline">${Object.entries(PIPES).map(([k,p])=>`<option value="${k}" ${k===d.pipe?'selected':''}>${esc(p.name)}</option>`).join('')}</select></dd></div>
+    <div class="wide"><dt>Next step</dt><dd><input data-field="next" value="${esc(d.next)}" placeholder="What happens next" aria-label="Next step"><span class="due ${n!=null&&n<0?'late':''}">${isOpen(d)?fmtDue(d.due):'Closed'}</span></dd></div>
+    <div class="wide"><dt>Business</dt><dd><input data-cfield="company" value="${esc(c.company)}" placeholder="Empty for agency leads" aria-label="Business"></dd></div>
+    <div><dt>Email</dt><dd><input data-cfield="email" value="${esc(c.email)}" aria-label="Email"></dd></div>
+    <div><dt>Phone</dt><dd><input data-cfield="phone" value="${esc(c.phone)}" aria-label="Phone"></dd></div>
+    <div><dt>Source</dt><dd>${esc(c.source)}</dd></div>
+    <div><dt>Added</dt><dd>${fmtAgo(c.added).replace(/^./,m=>m.toUpperCase())}</dd></div>
+  </dl>
+  <section class="sec"><h3>Activity</h3>
+    <form class="note-form" data-note="${cid}"><textarea name="t" rows="2" placeholder="Add a note" aria-label="Note"></textarea><button class="btn sm">Save note</button></form>
+    <ol class="tl">${items.map(a=>`<li><span class="t-ico">${I[a.type==='call'?'phone':a.type==='email'?'mail':a.type]}</span><div><div class="t-meta">${TLABEL[a.type]}, ${esc((TEAM[a.by]||{name:'Someone'}).name)}, ${fmtAgo(a.when)}</div><p class="t-text">${esc(a.text)}</p></div></li>`).join('')}</ol>
+  </section>
+  <button class="btn sm danger" data-delcontact="${cid}" style="margin-top:18px">Delete contact</button>`;
+}
+function projectDrawer(id){
+  const p=projects.find(x=>x.id===id),done=p.tasks.filter(t=>t[1]).length,pct=Math.round(done/p.tasks.length*100),n=dayDiff(p.due);
+  return `<header class="dr-head"><span class="av lg" style="--h:${hue(p.client)}">${ini(p.client)}</span>
+    <div class="dr-title"><h2>${esc(p.name)}</h2><p>${esc(p.client)}</p></div>
+    <button class="icon-btn" data-close aria-label="Close">${I.x}</button></header>
+  <dl class="fields" style="margin-top:18px">
+    <div><dt>Stage</dt><dd><select data-pfield="stage" aria-label="Stage">${PSTAGES.map(s=>`<option ${s===p.stage?'selected':''}>${s}</option>`).join('')}</select></dd></div>
+    <div><dt>Owner</dt><dd><select data-pfield="owner" aria-label="Owner">${ownerOpts(p.owner)}</select></dd></div>
+    <div><dt>Type</dt><dd>${esc((PIPES[p.type]||{}).name||'')}</dd></div>
+    <div><dt>Due</dt><dd>${p.due.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}${p.stage!=='Live'&&n<0?` <span class="due late">${-n}d late</span>`:''}</dd></div>
+  </dl>
+  <div class="prog-line"><div class="bar ${pct===100?'done':''}"><i style="width:${pct}%"></i></div><span>${done} of ${p.tasks.length} done</span></div>
+  <section class="sec"><h3>Checklist</h3>
+    <ul class="tasks">${p.tasks.map((t,i)=>`<li class="${t[1]?'done':''}"><label><input type="checkbox" data-task="${i}" ${t[1]?'checked':''}><span>${esc(t[0])}</span></label></li>`).join('')}</ul>
+    <form class="note-form" data-addtask="${p.id}"><input name="t" placeholder="Add a task" aria-label="New task"><button class="btn sm">Add task</button></form>
+  </section>
+  ${p.cid&&byC(p.cid)?`<button class="btn sm" data-gocontact="${p.cid}" style="margin-top:8px">Open client</button>`:''}`;
+}
+function pipesDrawer(key){
+  if(!PIPES[key])key=state.drawer.id=Object.keys(PIPES)[0];
+  const P=PIPES[key],open=openStages(key),cnt=s=>deals.filter(d=>d.pipe===key&&d.stage===s).length;
+  return `<header class="dr-head"><div class="dr-title"><h2>Pipelines and stages</h2><p>Changes apply to the whole team.</p></div><button class="icon-btn" data-close aria-label="Close">${I.x}</button></header>
+  <div style="display:flex;gap:8px;margin:18px 0 0"><select data-pickpipe aria-label="Pipeline">${Object.entries(PIPES).map(([k,p])=>`<option value="${k}" ${k===key?'selected':''}>${esc(p.name)}</option>`).join('')}</select><button class="btn sm" data-newpipe style="height:34px">New pipeline</button></div>
+  <dl class="fields" style="margin:16px 0 18px"><div class="wide"><dt>Name</dt><dd><input data-pipename value="${esc(P.name)}" aria-label="Pipeline name"></dd></div></dl>
+  <section class="sec"><h3>Stages</h3>
+    <ul class="stages">${open.map((s,i)=>`<li><input data-stagename="${i}" value="${esc(s)}" aria-label="Stage name"><span class="cnt" title="Deals in this stage">${cnt(s)}</span><button class="icon-btn" data-up="${i}" ${i?'':'disabled'} aria-label="Move up">${I.up}</button><button class="icon-btn" data-down="${i}" ${i<open.length-1?'':'disabled'} aria-label="Move down">${I.down}</button><button class="icon-btn" data-delstage="${i}" ${open.length>1?'':'disabled'} aria-label="Delete stage">${I.trash}</button></li>`).join('')}
+      <li class="locked"><span>Won</span><span class="cnt">${cnt('Won')}</span></li><li class="locked"><span>Lost</span><span class="cnt">${cnt('Lost')}</span></li></ul>
+    <p class="muted small" style="margin:0 0 10px">Won and Lost are fixed so reports stay accurate.</p>
+    <form class="note-form" data-addstage><input name="t" placeholder="New stage" aria-label="New stage name"><button class="btn sm">Add stage</button></form>
+  </section>
+  <button class="btn sm danger" data-delpipe style="margin-top:14px">Delete pipeline</button>`;
+}
+function pipesClick(b){
+  const key=state.drawer.id,P=PIPES[key],st=P.stages,cnt=s=>deals.filter(d=>d.pipe===key&&d.stage===s).length;
+  if(b.hasAttribute('data-up')||b.hasAttribute('data-down')){
+    const up=b.hasAttribute('data-up'),i=+(up?b.dataset.up:b.dataset.down),j=up?i-1:i+1;
+    [st[i],st[j]]=[st[j],st[i]];refresh();
+  } else if(b.hasAttribute('data-delstage')){
+    const i=+b.dataset.delstage,name=st[i],n=cnt(name),open=openStages(key),to=open[i-1]||open[i+1];
+    deals.forEach(d=>{if(d.pipe===key&&d.stage===name)d.stage=to});
+    st.splice(i,1);refresh();toast(n?`Stage deleted. ${n} moved to ${to}`:'Stage deleted');
+  } else if(b.hasAttribute('data-newpipe')){
+    openModal({title:'New pipeline',submit:'Create pipeline',body:`<label>Name<input name="name" placeholder="For example, Partnerships"></label><p class="m-sub small">Starts with New lead, In progress, Won and Lost.</p><p class="err" hidden></p>`,
+      onSubmit(E){
+        const name=clean(E.name.value);
+        if(!name)return showErr('Add a name.');
+        if(Object.values(PIPES).some(p=>p.name.toLowerCase()===name.toLowerCase()))return showErr('A pipeline with this name already exists.');
+        const k='p'+Date.now().toString(36);PIPES[k]={name,short:name,stages:['New lead','In progress','Won','Lost']};
+        state.pipe=k;state.drawer.id=k;refresh();toast('Pipeline created');
+      }});
+  } else if(b.hasAttribute('data-delpipe')){
+    if(Object.keys(PIPES).length<2)return toast('You need at least one pipeline');
+    const used=deals.filter(d=>d.pipe===key).length+projects.filter(p=>p.type===key).length;
+    if(used)return toast(`Move its ${used} deals and projects first`);
+    delete PIPES[key];state.pipe=Object.keys(PIPES)[0];state.drawer.id=state.pipe;refresh();toast('Pipeline deleted');
+  }
+}
+function pipesChange(t){
+  const key=state.drawer.id,P=PIPES[key];
+  if(t.hasAttribute('data-pickpipe')){state.drawer.id=state.pipe=t.value;refresh();return}
+  if(t.hasAttribute('data-pipename')){const v=clean(t.value);if(!v){t.value=P.name;return toast('Add a name')}P.name=P.short=v;refresh();return toast('Saved')}
+  if(t.dataset.stagename!=null){
+    const i=+t.dataset.stagename,old=P.stages[i],v=clean(t.value);
+    if(!v||P.stages.some((s,j)=>j!==i&&s.toLowerCase()===v.toLowerCase())||/^(won|lost)$/i.test(v)){t.value=old;return toast('Use a new, unique stage name')}
+    P.stages[i]=v;deals.forEach(d=>{if(d.pipe===key&&d.stage===old)d.stage=v});refresh();toast('Stage renamed');
+  }
+}
+function deleteContact(cid){
+  const c=byC(cid);
+  openModal({title:'Delete contact',submit:'Delete',body:`<p class="m-sub">This removes ${esc(c.name)}, their deal and all activity. You can’t undo this.</p>`,
+    onSubmit(){
+      const rm=(a,f)=>{for(let i=a.length-1;i>=0;i--)if(f(a[i]))a.splice(i,1)};
+      rm(contacts,x=>x.id===cid);rm(deals,x=>x.cid===cid);rm(acts,x=>x.cid===cid);
+      closeDrawer();refresh();toast('Contact deleted');
+    }});
+}
+drawer.addEventListener('click',e=>{
+  const rt=e.target.closest('[data-rmtag]');
+  if(rt&&state.drawer){const c=byC(state.drawer.id);c.tags=c.tags.filter(x=>x!==rt.dataset.rmtag);refresh();toast('Tag removed');return}
+  const b=e.target.closest('[data-close],[data-log],[data-gocontact],[data-delcontact],[data-askabout],[data-up],[data-down],[data-delstage],[data-newpipe],[data-delpipe]');if(!b||b.disabled)return;
+  if(b.hasAttribute('data-close'))closeDrawer();
+  else if(b.dataset.log)logCall(b.dataset.log);
+  else if(b.dataset.gocontact)openDrawer('contact',b.dataset.gocontact);
+  else if(b.dataset.delcontact)deleteContact(b.dataset.delcontact);
+  else if(b.dataset.askabout){const c=byC(b.dataset.askabout);closeDrawer();openChat();sendChat(`What’s the latest with ${c.name}, and what should we do next?`)}
+  else pipesClick(b);
+});
+drawer.addEventListener('change',e=>{
+  const t=e.target,s=state.drawer;if(!s)return;
+  if(s.kind==='pipes'){pipesChange(t);return}
+  if(t.dataset.field){
+    const d=dealOf(s.id),f=t.dataset.field;
+    if(f==='stage'){moveStage(d.id,t.value);return}
+    if(f==='pipe'){d.pipe=t.value;if(!PIPES[d.pipe].stages.includes(d.stage))d.stage=PIPES[d.pipe].stages[0];acts.push({cid:d.cid,type:'stage',when:new Date(),by:ME,text:'Moved to '+PIPES[d.pipe].name+', '+d.stage});refresh();toast('Moved to '+PIPES[d.pipe].name);return}
+    if(f==='value'){const v=parseInt(t.value.replace(/\D/g,''),10);if(!v){t.value=d.value;toast('Enter a value in USD');return}d.value=v}
+    else if(f==='owner'){d.owner=t.value;acts.push({cid:d.cid,type:'note',when:new Date(),by:ME,text:'Assigned to '+TEAM[t.value].name})}
+    else d[f]=t.value.trim();
+    refresh();toast('Saved');
+  } else if(t.dataset.cfield){
+    const c=byC(s.id),f=t.dataset.cfield,v=t.value.trim();
+    if(f==='email'&&!isEmail(v)){t.value=c.email;return toast('Enter a valid email')}
+    c[f]=f==='company'?clean(v):v;refresh();toast('Saved');
+  } else if(t.dataset.pfield){
+    const p=projects.find(x=>x.id===s.id);p[t.dataset.pfield]=t.value;refresh();toast('Saved');
+  } else if(t.dataset.task!=null){
+    const p=projects.find(x=>x.id===s.id);p.tasks[+t.dataset.task][1]=t.checked?1:0;refresh();
+  }
+});
+drawer.addEventListener('submit',e=>{
+  e.preventDefault();const f=e.target,v=f.elements.t.value.trim();if(!v)return;
+  if(f.dataset.note){acts.push({cid:f.dataset.note,type:'note',when:new Date(),by:ME,text:v});dealOf(f.dataset.note).touched=new Date();refresh();toast('Note saved')}
+  else if(f.dataset.addtask){projects.find(x=>x.id===f.dataset.addtask).tasks.push([v,0]);refresh();toast('Task added')}
+  else if(f.dataset.addtag){
+    const c=byC(f.dataset.addtag);let n=clean(v).slice(0,24);
+    const known=allTags().find(x=>x.toLowerCase()===n.toLowerCase());if(known)n=known;
+    if(n&&!c.tags.some(x=>x.toLowerCase()===n.toLowerCase())){c.tags.push(n);refresh();toast('Tag added')}else refresh();
+    const inp=drawer.querySelector('[data-addtag] input');if(inp)inp.focus();
+  }
+  else if(f.hasAttribute('data-addstage')){const P=PIPES[state.drawer.id],n=clean(v);if(!n||/^(won|lost)$/i.test(n)||P.stages.some(s=>s.toLowerCase()===n.toLowerCase()))return toast('Use a new, unique stage name');P.stages.splice(P.stages.length-2,0,n);refresh();toast('Stage added')}
+});
+
+/* ---------- Modal ---------- */
+const mWrap=$('#modalWrap'),modal=$('#modal');
+function openModal({title,body,submit,onSubmit}){
+  modal.innerHTML=`<form novalidate><header class="m-head"><h2>${title}</h2><button type="button" class="icon-btn" data-mclose aria-label="Close">${I.x}</button></header><div class="m-body">${body}</div><footer class="m-foot"><button type="button" class="btn" data-mclose>Cancel</button><button class="btn primary">${submit}</button></footer></form>`;
+  mWrap.hidden=false;
+  const f=modal.querySelector('form');
+  f.onsubmit=e=>{e.preventDefault();if(onSubmit(f.elements)!==false)closeModal()};
+  modal.querySelectorAll('[data-mclose]').forEach(b=>b.onclick=closeModal);
+  setTimeout(()=>{(modal.querySelector('.m-body input:not([type=radio]),.m-body textarea')||modal.querySelector('.m-foot .btn.primary')).focus()},30);
+}
+function closeModal(){mWrap.hidden=true;modal.innerHTML=''}
+mWrap.addEventListener('mousedown',e=>{if(e.target===mWrap)closeModal()});
+function showErr(msg){const e=modal.querySelector('.err');e.textContent=msg;e.hidden=false;return false}
+function logCall(did){
+  const d=deals.find(x=>x.id===did),c=byC(d.cid);
+  openModal({title:'Log call with '+esc(first(c.name)),submit:'Save',body:`
+    <p class="m-sub">${esc(c.name)}${c.company?', '+esc(c.company):''}. ${theirTime(c.tz).time} their time.</p>
+    <fieldset class="chips"><legend>Outcome</legend>${['Connected','No answer','Left voicemail','Booked a call'].map((o,i)=>`<label><input type="radio" name="o" value="${o}" ${i?'':'checked'}><span>${o}</span></label>`).join('')}</fieldset>
+    <label>Notes<textarea name="notes" rows="3" placeholder="What did you learn?"></textarea></label>
+    <div class="row2"><label>Next step<input name="next" value="${esc(d.next)}"></label>
+    <label>When<select name="when"><option value="1">Tomorrow</option><option value="2">In 2 days</option><option value="7">Next week</option><option value="">No next step</option></select></label></div>`,
+    onSubmit(E){
+      const o=E.o.value,n=E.notes.value.trim();
+      acts.push({cid:c.id,type:'call',when:new Date(),by:ME,text:o+(n?'. '+n:'.')});
+      d.next=E.next.value.trim();d.due=E.when.value?at(+E.when.value,10):null;d.touched=new Date();
+      refresh();toast('Call logged');
+    }});
+}
+function newContact(){
+  openModal({title:'New contact',submit:'Add contact',body:`
+    <label>Full name<input name="name" autocomplete="off"></label>
+    <label>Business <span class="opt">Leave empty for agency leads</span><input name="company" autocomplete="off"></label>
+    <div class="row2"><label>Email<input name="email" type="email" autocomplete="off"></label><label>Phone<input name="phone" type="tel" autocomplete="off"></label></div>
+    <div class="row2"><label>Location<select name="city">${Object.keys(CITY).map(k=>`<option>${k}</option>`).join('')}</select></label>
+    <label>Source<select name="source">${SOURCES.map(s=>`<option>${s}</option>`).join('')}</select></label></div>
+    <div class="row2"><label>Pipeline<select name="pipe">${Object.entries(PIPES).map(([k,p])=>`<option value="${k}">${esc(p.name)}</option>`).join('')}</select></label>
+    <label>Deal value (USD)<input name="value" inputmode="numeric" value="10000"></label></div>
+    <div class="row2"><label>Owner<select name="owner">${ownerOpts(ME)}</select></label><label>Tags <span class="opt">comma separated</span><input name="tags" autocomplete="off"></label></div>
+    <p class="err" hidden></p>`,
+    onSubmit(E){
+      const name=E.name.value.trim(),email=E.email.value.trim().toLowerCase(),value=parseInt(E.value.value.replace(/\D/g,''),10);
+      if(!name)return showErr('Add a name.');
+      if(!isEmail(email))return showErr('Add a valid email.');
+      if(contacts.some(c=>c.email===email))return showErr('A contact with this email already exists.');
+      if(!value)return showErr('Add a deal value in USD.');
+      const id='c'+(++seq),city=E.city.value;
+      contacts.push({id,name:clean(name),company:clean(E.company.value),city,tz:CITY[city][0],email,phone:E.phone.value.trim()||'Not added',source:E.source.value,added:new Date(),tags:[...new Set(E.tags.value.split(',').map(x=>clean(x).slice(0,24)).filter(Boolean))]});
+      deals.push({id:'d'+seq,cid:id,pipe:E.pipe.value,stage:PIPES[E.pipe.value].stages[0],value,owner:E.owner.value,next:'First call',due:at(0,Math.min(NOW.getHours()+1,23)),touched:new Date(),closedAt:null});
+      acts.push({cid:id,type:'added',when:new Date(),by:ME,text:'Added by hand. Source: '+E.source.value});
+      setTimeout(()=>{refresh();openDrawer('contact',id);toast('Contact added')},0);
+    }});
+}
+function invite(){
+  openModal({title:'Invite to the workspace',submit:'Send invite',body:`
+    <label>Work email<input name="email" type="email" placeholder="name@${DOMAIN}"></label>
+    <label>Role<select name="role">${ROLES.map(r=>`<option ${r==='Setter'?'selected':''}>${r}</option>`).join('')}</select></label>
+    <p class="m-sub small">They’ll get a sign in link that expires in 48 hours.</p>
+    <p class="err" hidden></p>`,
+    onSubmit(E){
+      const email=E.email.value.trim().toLowerCase();
+      if(!email.endsWith('@'+DOMAIN)||email.length<=DOMAIN.length+1)return showErr('Only @'+DOMAIN+' emails can be invited.');
+      if(Object.values(TEAM).some(u=>u.email===email))return showErr('That person is already on the team.');
+      const local=email.split('@')[0];
+      TEAM['u'+Date.now().toString(36)]={name:local.charAt(0).toUpperCase()+local.slice(1),role:E.role.value,email,last:'Never',status:'Invited'};
+      auditLog.unshift(['Ali Nawaz invited '+email+' as '+E.role.value+'.','Just now']);
+      render();toast('Invite sent');
+    }});
+}
+
+/* ---------- Ask (chat) ---------- */
+const chatEl=$('#chat'),chatBody=$('#chatBody'),chatIn=$('#chatIn'),chatSend=$('#chatSend');
+let sampleFn,sampleReady=false,chatTurns=[],chatCtl=null;
+const SUGG=['Who should I call first today?','Which deals are going cold?','What’s waiting on a proposal?','Summarise the agency pipeline'];
+(async()=>{try{if(window.claude&&typeof window.claude.use==='function')sampleFn=await window.claude.use('sample')}catch(e){sampleFn=null}sampleReady=true;if(!chatTurns.length)chatIntro()})();
+function chatIntro(){
+  if(sampleReady&&!sampleFn){chatBody.innerHTML=`<p class="chat-intro">Ask only works when this preview is opened inside Claude. In the real build it runs on our server, so every rep has it.</p>`;chatIn.disabled=true;chatSend.disabled=true;return}
+  chatBody.innerHTML=`<p class="chat-intro">Ask anything about your contacts, deals or team.</p><div class="sugg">${SUGG.map(s=>`<button type="button" data-sugg="${esc(s)}">${esc(s)}</button>`).join('')}</div>`;
+}
+function openChat(){appEl.classList.add('chat-open');$('#askBtn').setAttribute('aria-expanded','true');if(!chatTurns.length)chatIntro();setTimeout(()=>chatIn.focus(),30)}
+function closeChat(){appEl.classList.remove('chat-open');$('#askBtn').setAttribute('aria-expanded','false');if(chatCtl)chatCtl.abort()}
+$('#askBtn').onclick=()=>appEl.classList.contains('chat-open')?closeChat():openChat();
+$('#chatClose').onclick=closeChat;
+chatBody.addEventListener('click',e=>{
+  const s=e.target.closest('[data-sugg]');if(s)return sendChat(s.dataset.sugg);
+  const l=e.target.closest('[data-clink]');if(l&&byC(l.dataset.clink))openDrawer('contact',l.dataset.clink);
+});
+function fmtAnswer(text){
+  const inline=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\[\[(c\d+)\|([^\]]+)\]\]/g,(m,id,n)=>`<button type="button" class="clink" data-clink="${id}">${n}</button>`);
+  const out=[];let list=[];
+  text.replace(/\u2014|\u2013/g,',').split('\n').forEach(line=>{
+    const t=line.trim();if(/^[-*] /.test(t)){list.push(`<li>${inline(t.slice(2))}</li>`);return}
+    if(list.length){out.push(`<ul>${list.join('')}</ul>`);list=[]}
+    if(t)out.push(`<p>${inline(t)}</p>`);
+  });
+  if(list.length)out.push(`<ul>${list.join('')}</ul>`);
+  return out.join('');
+}
+function snapshot(){
+  return JSON.stringify({
+    today:NOW.toDateString(),askedBy:'Ali Nawaz (Admin)',
+    team:Object.values(TEAM).map(u=>({name:u.name,role:u.role})),
+    pipelines:Object.values(PIPES).map(p=>({name:p.name,stages:p.stages})),
+    contacts:contacts.map(c=>{const d=dealOf(c.id);if(!d)return null;return {id:c.id,name:c.name,business:c.company||null,city:c.city,theirTimeNow:theirTime(c.tz).time,source:c.source,tags:c.tags,pipeline:PIPES[d.pipe].name,stage:d.stage,valueUSD:d.value,owner:(TEAM[d.owner]||{}).name,nextStep:isOpen(d)?(d.next||null):null,due:isOpen(d)?fmtDue(d.due):null,daysSinceLastContact:-dayDiff(d.touched),recent:acts.filter(a=>a.cid===c.id&&a.type!=='added').sort((a,b)=>b.when-a.when).slice(0,4).map(a=>`${fmtAgo(a.when)}, ${(TEAM[a.by]||{name:'Someone'}).name}: ${a.text}`)}}).filter(Boolean),
+    deliveryProjects:projects.map(p=>({client:p.client,name:p.name,stage:p.stage,owner:(TEAM[p.owner]||{}).name,tasksDone:p.tasks.filter(t=>t[1]).length,tasksTotal:p.tasks.length}))
+  });
+}
+const INSTR=`You are the assistant inside a sales CRM used by a small sales team selling AI services. Answer using only the CRM data provided. If the data doesn't contain the answer, say so plainly. Be brief and practical: 1 to 4 short sentences, or a few lines starting with "- " when listing deals. Use plain language and US dollars. Never use em dashes or en dashes. Whenever you mention a contact, write it exactly as [[id|Full Name]], for example [[c1|Dave Morales]].`;
+async function sendChat(q){
+  q=String(q||'').trim();if(!q||chatCtl||!sampleFn)return;
+  if(!chatTurns.length)chatBody.innerHTML='';
+  chatIn.value='';chatIn.style.height='';
+  chatBody.insertAdjacentHTML('beforeend',`<div class="msg you">${esc(q)}</div>`);
+  const bot=document.createElement('div');bot.className='msg bot';bot.innerHTML='<p class="thinking">Thinking</p>';chatBody.appendChild(bot);chatBody.scrollTop=chatBody.scrollHeight;
+  const history=chatTurns.slice(-8);
+  const input=[...history,{role:'user',content:`${INSTR}\n\nCRM data, as of now:\n${snapshot()}\n\nQuestion: ${q}`}];
+  chatCtl=new AbortController();chatSend.textContent='Stop';chatSend.type='button';
+  try{
+    const {text}=await sampleFn(input,{modelTier:'quick',cache:false,signal:chatCtl.signal,onText:({text})=>{bot.innerHTML=fmtAnswer(text);chatBody.scrollTop=chatBody.scrollHeight}});
+    bot.innerHTML=fmtAnswer(text);
+    chatTurns.push({role:'user',content:q},{role:'assistant',content:text});
+  }catch(e){
+    const keep=e&&e.text?fmtAnswer(e.text):'';
+    const msg=e&&e.code==='not_granted'?'Ask needs permission to use Claude. Reload the page and allow it.':e&&e.code==='rate_limited'?'Too many questions at once. Wait a moment and try again.':e&&e.code==='aborted'?'Stopped.':'Couldn’t get an answer. Try again.';
+    bot.innerHTML=keep+`<p class="msg-err">${msg}</p>`;
+    if(e&&e.code==='not_granted'){chatIn.disabled=true;chatSend.disabled=true}
+  }finally{chatCtl=null;chatSend.textContent='Send';chatSend.type='submit';chatBody.scrollTop=chatBody.scrollHeight}
+}
+$('#chatForm').addEventListener('submit',e=>{e.preventDefault();sendChat(chatIn.value)});
+chatSend.addEventListener('click',e=>{if(chatCtl){e.preventDefault();chatCtl.abort()}});
+chatIn.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat(chatIn.value)}});
+chatIn.addEventListener('input',()=>{chatIn.style.height='';chatIn.style.height=Math.min(chatIn.scrollHeight,140)+'px'});
+
+/* ---------- Top bar, keys, theme ---------- */
+$('#searchIco').outerHTML=I.search;$('#plusIco').outerHTML=I.plus;$('#askIco').outerHTML=I.ask;$('#askIco2').outerHTML=I.ask;$('#chatClose').innerHTML=I.x;
+const qEl=$('#q');
+qEl.addEventListener('input',()=>{state.q=qEl.value;if(location.hash!=='#contacts')location.hash='#contacts';else render()});
+$('#newBtn').onclick=newContact;
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if(!mWrap.hidden)closeModal();else if(state.drawer)closeDrawer();else if(appEl.classList.contains('chat-open'))closeChat()}
+  if(e.key==='/'&&!appEl.hidden&&!e.target.closest('input,textarea,select')){e.preventDefault();qEl.focus()}
+});
+const themes=['system','light','dark'];let ti=0;
+try{const s=localStorage.getItem('crm-theme');if(themes.includes(s))ti=themes.indexOf(s)}catch(e){}
+function applyTheme(){const t=themes[ti];if(t==='system')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t);$('#themeBtn').textContent=t==='system'?'Theme: auto':'Theme: '+t}
+$('#themeBtn').onclick=()=>{ti=(ti+1)%3;applyTheme();try{localStorage.setItem('crm-theme',themes[ti])}catch(e){}};
+applyTheme();
+
+stepStart();
+})();
+</script>
+</body>
+</html>
